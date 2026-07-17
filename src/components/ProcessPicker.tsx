@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { LoaderCircle, Search, X } from "lucide-react";
+import { Alert, Avatar, Box, Center, Group, Loader, Modal, ScrollArea, Stack, Text, TextInput, UnstyledButton } from "@mantine/core";
+import { AlertTriangle, Search } from "lucide-react";
 import { api } from "../api";
 import type { RunningProcess } from "../types";
 
@@ -33,35 +34,55 @@ export function ProcessPicker({ open, onClose, onSelect }: ProcessPickerProps) {
     }
     const normalizedQuery = query.trim().toLowerCase();
     return [...unique.values()]
-      .filter((process) =>
-        !normalizedQuery
-        || process.name.toLowerCase().includes(normalizedQuery)
-        || process.executable.toLowerCase().includes(normalizedQuery),
-      )
+      .filter((process) => !normalizedQuery || process.name.toLowerCase().includes(normalizedQuery) || process.executable.toLowerCase().includes(normalizedQuery))
       .slice(0, 100);
   }, [processes, query]);
 
-  if (!open) return null;
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
-      <section className="modal" role="dialog" aria-modal="true" aria-label="Choose a running process" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="modal__header">
-          <div><p className="kicker">Running now</p><h2>Choose a process</h2></div>
-          <button type="button" className="icon-button" onClick={onClose}><X size={18} /></button>
-        </div>
-        <label className="search-box"><Search size={16} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search processes" /></label>
-        <div className="process-results">
-          {loading && <div className="loading-row"><LoaderCircle className="spin" size={18} /> Reading processes…</div>}
-          {error && <div className="inline-error">{error}</div>}
-          {!loading && visible.map((process) => (
-            <button type="button" key={`${process.name}-${process.pid}`} onClick={() => { onSelect(process.name); onClose(); }}>
-              <span className="process-icon">{process.name.slice(0, 1).toUpperCase()}</span>
-              <span><strong>{process.name}</strong><small>{process.executable || `PID ${process.pid}`}</small></span>
-            </button>
-          ))}
-          {!loading && !error && visible.length === 0 && <p className="empty-copy">No matching processes.</p>}
-        </div>
-      </section>
-    </div>
+    <Modal
+      opened={open}
+      onClose={onClose}
+      title={<Box><Text className="eyebrow" c="dimmed">PROCESSES</Text><Text fw={750} size="lg">Select process</Text></Box>}
+      size="lg"
+      radius="xl"
+      centered
+      overlayProps={{ backgroundOpacity: 0.72, blur: 8 }}
+      classNames={{ content: "process-modal", header: "process-modal__header" }}
+    >
+      <TextInput
+        autoFocus
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search by process or path"
+        leftSection={<Search size={16} />}
+        size="md"
+        mb="md"
+      />
+      <ScrollArea.Autosize mah={440} type="hover">
+        {loading && <Center py={48}><Stack align="center" gap="sm"><Loader size="sm" /><Text c="dimmed" size="sm">Reading processes…</Text></Stack></Center>}
+        {error && <Alert color="red" icon={<AlertTriangle size={16} />}>{error}</Alert>}
+        {!loading && !error && (
+          <Stack gap={4}>
+            {visible.map((process) => (
+              <UnstyledButton
+                className="process-result"
+                type="button"
+                key={`${process.name}-${process.pid}`}
+                onClick={() => { onSelect(process.name); onClose(); }}
+              >
+                <Group wrap="nowrap">
+                  <Avatar color="ultraviolet" variant="light" radius="md">{process.name.slice(0, 1).toUpperCase()}</Avatar>
+                  <Box className="process-result__copy">
+                    <Text fw={650} size="sm">{process.name}</Text>
+                    <Text c="dimmed" size="xs" truncate>{process.executable || `PID ${process.pid}`}</Text>
+                  </Box>
+                </Group>
+              </UnstyledButton>
+            ))}
+            {visible.length === 0 && <Text c="dimmed" size="sm" ta="center" py={48}>No matching processes.</Text>}
+          </Stack>
+        )}
+      </ScrollArea.Autosize>
+    </Modal>
   );
 }

@@ -1,6 +1,22 @@
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { Download, ExternalLink, FileUp, ShieldCheck } from "lucide-react";
+import {
+  Alert,
+  Badge,
+  Box,
+  Button,
+  Group,
+  Paper,
+  Select,
+  SimpleGrid,
+  Stack,
+  Switch,
+  Text,
+  TextInput,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
+import { Download, ExternalLink, FileUp, HardDrive, RadioTower, Route, Settings2, ShieldCheck } from "lucide-react";
 import type { AppConfig } from "../types";
 
 interface SettingsScreenProps {
@@ -11,8 +27,7 @@ interface SettingsScreenProps {
 }
 
 export function SettingsScreen({ config, onChange, onImport, onExport }: SettingsScreenProps) {
-  const updateSettings = (patch: Partial<AppConfig["settings"]>) =>
-    onChange({ ...config, settings: { ...config.settings, ...patch } });
+  const updateSettings = (patch: Partial<AppConfig["settings"]>) => onChange({ ...config, settings: { ...config.settings, ...patch } });
 
   const importConfiguration = async () => {
     const path = await open({ multiple: false, directory: false, filters: [{ name: "ActivityMux configuration", extensions: ["json"] }] });
@@ -26,43 +41,63 @@ export function SettingsScreen({ config, onChange, onImport, onExport }: Setting
 
   return (
     <div className="screen settings-screen">
-      <header className="screen-header">
-        <div>
-          <p className="kicker">Configuration</p>
-          <h1>Connect and personalize.</h1>
-          <p>ActivityMux stores all configuration locally on this computer.</p>
-        </div>
+      <header className="screen-header hero-header">
+        <Box>
+          <Badge variant="light" color="ultraviolet" size="sm" mb="sm">SETTINGS</Badge>
+          <Title order={1}>Settings</Title>
+          <Text c="dimmed" mt="xs">Local configuration.</Text>
+        </Box>
       </header>
 
-      <div className="settings-grid">
-        <section className="panel settings-section">
-          <div className="settings-section__heading"><span className="settings-icon">01</span><div><h2>Discord connection</h2><p>This public application ID supplies the default profile title and artwork library. Presets can override it.</p></div></div>
-          <label>Discord application ID<input inputMode="numeric" value={config.settings.discordApplicationId} onChange={(event) => updateSettings({ discordApplicationId: event.target.value.replace(/\D/g, "") })} placeholder="123456789012345678" /></label>
-          <button type="button" className="text-button" onClick={() => openUrl("https://discord.com/developers/applications")}><ExternalLink size={14} /> Open Discord Developer Portal</button>
-          <div className="info-callout"><ShieldCheck size={18} /><span><strong>Never paste a client secret.</strong> ActivityMux only needs the numeric Application ID shown under General Information.</span></div>
-        </section>
+      <SimpleGrid className="settings-grid" cols={{ base: 1, lg: 2 }} spacing="lg">
+        <Paper className="glass-panel settings-section" radius="xl" p="xl">
+          <Group align="flex-start" gap="md" mb="lg" wrap="nowrap">
+            <ThemeIcon variant="gradient" gradient={{ from: "ultraviolet.5", to: "signal.5" }} size="lg" radius="md"><RadioTower size={18} /></ThemeIcon>
+            <Box><Text className="eyebrow" c="dimmed">01 · CONNECTION</Text><Title order={3}>Discord</Title><Text c="dimmed" size="sm" mt={4}>Default application ID.</Text></Box>
+          </Group>
+          <TextInput label="Discord application ID" inputMode="numeric" value={config.settings.discordApplicationId} onChange={(event) => updateSettings({ discordApplicationId: event.target.value.replace(/\D/g, "") })} placeholder="123456789012345678" size="md" />
+          <Button mt="md" variant="subtle" color="ultraviolet" leftSection={<ExternalLink size={15} />} onClick={() => openUrl("https://discord.com/developers/applications")}>Open Developer Portal</Button>
+          <Alert mt="md" variant="light" color="teal" icon={<ShieldCheck size={18} />} title="Application ID only">Never paste a client secret or bot token.</Alert>
+        </Paper>
 
-        <section className="panel settings-section">
-          <div className="settings-section__heading"><span className="settings-icon">02</span><div><h2>Selection behavior</h2><p>Choose the fallback used when no process rule matches.</p></div></div>
-          <label>Default preset<select value={config.defaultPresetId ?? ""} onChange={(event) => onChange({ ...config, defaultPresetId: event.target.value || null })}><option value="">Clear presence</option>{config.presets.map((preset) => <option value={preset.id} key={preset.id}>{preset.label}</option>)}</select></label>
-          <label>Process polling interval<select value={config.settings.pollIntervalMs} onChange={(event) => updateSettings({ pollIntervalMs: Number(event.target.value) })}><option value={500}>0.5 seconds</option><option value={1000}>1 second</option><option value={2000}>2 seconds</option><option value={5000}>5 seconds</option></select></label>
-        </section>
+        <Paper className="glass-panel settings-section" radius="xl" p="xl">
+          <Group align="flex-start" gap="md" mb="lg" wrap="nowrap">
+            <ThemeIcon variant="light" color="ultraviolet" size="lg" radius="md"><Route size={18} /></ThemeIcon>
+            <Box><Text className="eyebrow" c="dimmed">02 · SELECTION</Text><Title order={3}>Fallback</Title><Text c="dimmed" size="sm" mt={4}>Used when no rule matches.</Text></Box>
+          </Group>
+          <Stack gap="md">
+            <Select label="Default preset" data={[{ value: "__clear__", label: "Clear presence" }, ...config.presets.map((preset) => ({ value: preset.id, label: preset.label }))]} value={config.defaultPresetId ?? "__clear__"} onChange={(value) => onChange({ ...config, defaultPresetId: value === "__clear__" ? null : value })} />
+            <Select label="Process polling interval" data={[{ value: "500", label: "0.5 seconds" }, { value: "1000", label: "1 second" }, { value: "2000", label: "2 seconds" }, { value: "5000", label: "5 seconds" }]} value={String(config.settings.pollIntervalMs)} onChange={(value) => value && updateSettings({ pollIntervalMs: Number(value) })} />
+          </Stack>
+        </Paper>
 
-        <section className="panel settings-section">
-          <div className="settings-section__heading"><span className="settings-icon">03</span><div><h2>Desktop behavior</h2><p>Keep the routing service available without leaving a window open.</p></div></div>
-          <label className="toggle-row"><span><strong>Launch at login</strong><small>Start hidden and restore your presence automatically.</small></span><input type="checkbox" checked={config.settings.launchAtLogin} onChange={(event) => updateSettings({ launchAtLogin: event.target.checked })} /></label>
-          <label className="toggle-row"><span><strong>Close to tray</strong><small>The Quit tray action always exits completely.</small></span><input type="checkbox" checked={config.settings.closeToTray} onChange={(event) => updateSettings({ closeToTray: event.target.checked })} /></label>
-        </section>
+        <Paper className="glass-panel settings-section" radius="xl" p="xl">
+          <Group align="flex-start" gap="md" mb="lg" wrap="nowrap">
+            <ThemeIcon variant="light" color="ultraviolet" size="lg" radius="md"><Settings2 size={18} /></ThemeIcon>
+            <Box><Text className="eyebrow" c="dimmed">03 · DESKTOP</Text><Title order={3}>Desktop</Title><Text c="dimmed" size="sm" mt={4}>Startup and tray.</Text></Box>
+          </Group>
+          <Stack gap="xs">
+            <Paper className="setting-toggle" p="md" radius="lg">
+              <Switch label="Launch at login" description="Start hidden." checked={config.settings.launchAtLogin} onChange={(event) => updateSettings({ launchAtLogin: event.currentTarget.checked })} color="teal" />
+            </Paper>
+            <Paper className="setting-toggle" p="md" radius="lg">
+              <Switch label="Close to tray" description="Keep running." checked={config.settings.closeToTray} onChange={(event) => updateSettings({ closeToTray: event.currentTarget.checked })} color="teal" />
+            </Paper>
+          </Stack>
+        </Paper>
 
-        <section className="panel settings-section">
-          <div className="settings-section__heading"><span className="settings-icon">04</span><div><h2>Backup and transfer</h2><p>Move presets and rules between Windows and Linux.</p></div></div>
-          <div className="transfer-buttons">
-            <button type="button" className="button button--ghost" onClick={importConfiguration}><FileUp size={16} /> Import JSON</button>
-            <button type="button" className="button button--ghost" onClick={exportConfiguration}><Download size={16} /> Export JSON</button>
-          </div>
-          <p className="helper-copy">Import replaces the current local configuration after validation. Exported files never contain Discord credentials because ActivityMux does not use any.</p>
-        </section>
-      </div>
+        <Paper className="glass-panel settings-section" radius="xl" p="xl">
+          <Group align="flex-start" gap="md" mb="lg" wrap="nowrap">
+            <ThemeIcon variant="light" color="ultraviolet" size="lg" radius="md"><HardDrive size={18} /></ThemeIcon>
+            <Box><Text className="eyebrow" c="dimmed">04 · TRANSFER</Text><Title order={3}>Backup</Title><Text c="dimmed" size="sm" mt={4}>Import or export JSON.</Text></Box>
+          </Group>
+          <Group grow>
+            <Button variant="light" color="gray" leftSection={<FileUp size={16} />} onClick={importConfiguration}>Import JSON</Button>
+            <Button variant="light" color="ultraviolet" leftSection={<Download size={16} />} onClick={exportConfiguration}>Export JSON</Button>
+          </Group>
+          <Text c="dimmed" size="xs" mt="md">Imports are validated. No credentials are stored.</Text>
+        </Paper>
+      </SimpleGrid>
     </div>
   );
 }
