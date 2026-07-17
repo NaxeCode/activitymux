@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08090f" />
+    <meta name="description" content="ActivityMux switches your Discord Rich Presence using presets, process rules, and manual pins." />
+    <meta property="og:title" content="ActivityMux — Discord presence, routed" />
+    <meta property="og:description" content="Custom Discord Rich Presence that follows what you run." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://naxecode.github.io/activitymux/" />
+    <meta property="og:image" content="https://naxecode.github.io/activitymux/assets/dashboard.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://naxecode.github.io/activitymux/" />
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>ActivityMux — Discord presence, routed</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="wordmark" href="#top" aria-label="ActivityMux home">
+          <img src="./assets/icon.svg" width="34" height="34" alt="" />
+          <span>ActivityMux</span>
+        </a>
+        <nav aria-label="Primary navigation">
+          <a href="#features">Features</a>
+          <a href="#setup">Setup</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <a class="button button-small button-ghost" href="https://github.com/NaxeCode/activitymux" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+        <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+        <div class="shell hero-copy">
+          <div class="eyebrow"><span></span> DISCORD PRESENCE ROUTER</div>
+          <h1>Your activity.<br /><em>Your rules.</em></h1>
+          <p>Switch custom Discord Rich Presence from presets, running apps, or a manual pin.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/NaxeCode/activitymux/releases/latest">Download for Windows <span aria-hidden="true">↓</span></a>
+            <a class="button button-secondary" href="#setup">See how it works</a>
+          </div>
+          <div class="hero-meta" aria-label="Project highlights">
+            <span>Windows + Linux</span>
+            <span>Local only</span>
+            <span>MIT licensed</span>
+          </div>
+        </div>
+
+        <div class="shell product-stage">
+          <div class="stage-chrome" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <b>ACTIVITYMUX / DASHBOARD</b>
+          </div>
+          <img src="./assets/dashboard.webp" width="1800" height="1125" alt="ActivityMux dashboard showing a custom Discord presence and routing controls" />
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Privacy and platform details">
+        <div class="shell trust-grid">
+          <div><strong>3.6 MiB</strong><span>Installed app</span></div>
+          <div><strong>No token</strong><span>Application ID only</span></div>
+          <div><strong>Local IPC</strong><span>Talks to Discord directly</span></div>
+          <div><strong>Open source</strong><span>MIT on GitHub</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="shell">
+          <div class="section-heading">
+            <div class="eyebrow"><span></span> FEATURES</div>
+            <h2>One presence.<br />Four ways to control it.</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature-card feature-card-wide">
+              <div class="feature-number">01</div>
+              <div>
+                <h3>Presets</h3>
+                <p>Save activity text, artwork, buttons, and timers. Switch without rebuilding anything.</p>
+              </div>
+              <div class="signal-demo" aria-hidden="true">
+                <span>PLAYING</span>
+                <strong>Thinking about Messmer</strong>
+                <small>The flame still burns</small>
+              </div>
+            </article>
+            <article class="feature-card">
+              <div class="feature-number">02</div>
+              <h3>Process rules</h3>
+              <p>Publish a preset when an app runs. Priority decides which rule wins.</p>
+              <div class="rule-demo" aria-hidden="true"><span>eldenring.exe</span><b>900</b></div>
+            </article>
+            <article class="feature-card">
+              <div class="feature-number">03</div>
+              <h3>Manual pin</h3>
+              <p>Override every rule with one click. Clear it when you are done.</p>
+              <div class="pin-demo" aria-hidden="true"><i></i><span>Pinned</span></div>
+            </article>
+            <article class="feature-card feature-card-wide feature-card-last">
+              <div class="feature-number">04</div>
+              <div>
+                <h3>Runs quietly</h3>
+                <p>Tray mode, launch at login, Discord reconnect, and portable JSON configuration.</p>
+              </div>
+              <div class="status-demo" aria-hidden="true"><i></i><span>Discord online</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section setup-section" id="setup">
+        <div class="shell setup-layout">
+          <div class="section-heading sticky-heading">
+            <div class="eyebrow"><span></span> SETUP</div>
+            <h2>From install to live in three steps.</h2>
+            <p>No bot token. No client secret.</p>
+          </div>
+          <ol class="steps">
+            <li>
+              <span>01</span>
+              <div><h3>Create a Discord application</h3><p>Its name becomes your activity title. Copy the Application ID.</p></div>
+            </li>
+            <li>
+              <span>02</span>
+              <div><h3>Build a preset</h3><p>Add text, a timer, artwork, or up to two buttons.</p></div>
+            </li>
+            <li>
+              <span>03</span>
+              <div><h3>Choose when it appears</h3><p>Pin it, set a fallback, or connect it to a running process.</p></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="shell faq-layout">
+          <div class="section-heading">
+            <div class="eyebrow"><span></span> FAQ</div>
+            <h2>The short version.</h2>
+          </div>
+          <div class="faq-list">
+            <details>
+              <summary>Does ActivityMux need my Discord password or token?</summary>
+              <p>No. It uses a public Application ID and Discord's local IPC connection.</p>
+            </details>
+            <details>
+              <summary>Can it control Spotify or Discord's game detection?</summary>
+              <p>No. It controls only the custom presence that ActivityMux publishes.</p>
+            </details>
+            <details>
+              <summary>Where does my configuration go?</summary>
+              <p>It stays in a versioned JSON file on your computer.</p>
+            </details>
+            <details>
+              <summary>Why can Windows show a SmartScreen warning?</summary>
+              <p>The current installers are unsigned. The source and build workflow are public.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="download-section" id="download">
+        <div class="shell download-panel">
+          <div>
+            <div class="eyebrow"><span></span> FREE &amp; OPEN SOURCE</div>
+            <h2>Route your presence.</h2>
+            <p>Windows 10/11 and Linux.</p>
+          </div>
+          <div class="download-actions">
+            <a class="button button-primary" href="https://github.com/NaxeCode/activitymux/releases/latest">Get ActivityMux <span aria-hidden="true">↓</span></a>
+            <a class="text-link" href="https://github.com/NaxeCode/activitymux" target="_blank" rel="noreferrer">Read the source <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-inner">
+        <a class="wordmark" href="#top"><img src="./assets/icon.svg" width="30" height="30" alt="" /><span>ActivityMux</span></a>
+        <p>Built by <a href="https://github.com/NaxeCode">NaxeCode</a>. MIT licensed.</p>
+      </div>
+    </footer>
+  </body>
+</html>

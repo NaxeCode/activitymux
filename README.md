@@ -2,6 +2,8 @@
 
 Set one Discord Rich Presence from presets, process rules, or a manual pin.
 
+[Website](https://naxecode.github.io/activitymux/) · [Download](https://github.com/NaxeCode/activitymux/releases/latest)
+
 ## Download
 
 Get the latest installers from [Releases](https://github.com/NaxeCode/activitymux/releases/latest).
