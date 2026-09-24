@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { disable, enable } from "@tauri-apps/plugin-autostart";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { getVersion } from "@tauri-apps/api/app";
+import type { Update } from "@tauri-apps/plugin-updater";
 import {
   AppShell,
   Badge,
@@ -9,11 +10,14 @@ import {
   Divider,
   Group,
   Loader,
+  Modal,
   NavLink,
   Notification,
+  ScrollArea,
   Stack,
   Text,
   ThemeIcon,
+  UnstyledButton,
 } from "@mantine/core";
 import {
   Activity,
@@ -32,6 +36,9 @@ import { RulesScreen } from "./components/RulesScreen";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { DEMO_CONFIG, DEMO_SNAPSHOT } from "./demo";
 import type { AppConfig, Screen, ServiceSnapshot } from "./types";
+import { findUpdate, installUpdate, type UpdateOffer } from "./updates";
+import { HelpTip } from "./components/HelpTip";
+import { connectionHelp, livePresence } from "./explain";
 import "./App.css";
 
 const EMPTY_SNAPSHOT: ServiceSnapshot = {
@@ -44,10 +51,10 @@ const EMPTY_SNAPSHOT: ServiceSnapshot = {
 const DEMO_MODE = import.meta.env.DEV && new URLSearchParams(window.location.search).has("demo");
 
 const navigation: Array<{ id: Screen; label: string; description: string; icon: typeof CircleGauge }> = [
-  { id: "dashboard", label: "Dashboard", description: "Current presence", icon: CircleGauge },
-  { id: "presets", label: "Presets", description: "Activities", icon: Library },
-  { id: "rules", label: "Process rules", description: "Matching", icon: Workflow },
-  { id: "settings", label: "Settings", description: "Configuration", icon: Settings },
+  { id: "dashboard", label: "Dashboard", description: "What Discord is showing", icon: CircleGauge },
+  { id: "presets", label: "Presets", description: "Activities you can publish", icon: Library },
+  { id: "rules", label: "Process rules", description: "Switch by the open app", icon: Workflow },
+  { id: "settings", label: "Settings", description: "Discord ID and fallback", icon: Settings },
 ];
 
 const connectionCopy = {
@@ -65,6 +72,12 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+  const [appVersion, setAppVersion] = useState("0.2.1");
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
+  const [installingUpdate, setInstallingUpdate] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState<string | null>(null);
+  const [updateOffer, setUpdateOffer] = useState<UpdateOffer | null>(null);
+  const updateRef = useRef<Update | null>(null);
 
   useEffect(() => {
     if (DEMO_MODE) {
@@ -104,6 +117,29 @@ export default function App() {
     return () => window.clearTimeout(timeout);
   }, [message]);
 
+  useEffect(() => {
+    if (DEMO_MODE || !("__TAURI_INTERNALS__" in window)) return;
+    getVersion().then(setAppVersion).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (import.meta.env.DEV || DEMO_MODE || !("__TAURI_INTERNALS__" in window)) return;
+    let cancelled = false;
+    findUpdate()
+      .then((found) => {
+        if (cancelled || !found) {
+          void found?.update.close();
+          return;
+        }
+        updateRef.current = found.update;
+        setUpdateOffer(found.offer);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const dirty = useMemo(
     () => config !== null && savedConfig !== null && JSON.stringify(config) !== JSON.stringify(savedConfig),
     [config, savedConfig],
@@ -114,10 +150,6 @@ export default function App() {
     setSaving(true);
     try {
       const saved = DEMO_MODE ? structuredClone(nextConfig) : await api.saveConfig(nextConfig);
-      if (!DEMO_MODE) {
-        if (saved.settings.launchAtLogin) await enable();
-        else await disable();
-      }
       setConfig(saved);
       setSavedConfig(structuredClone(saved));
       setMessage({ kind: "success", text: "Configuration saved" });
@@ -140,6 +172,53 @@ export default function App() {
       </Center>
     );
   }
+
+  const dismissUpdate = () => {
+    if (installingUpdate) return;
+    const pending = updateRef.current;
+    updateRef.current = null;
+    setUpdateOffer(null);
+    setUpdateProgress(null);
+    void pending?.close();
+  };
+
+  const checkForUpdates = async () => {
+    if (DEMO_MODE || !("__TAURI_INTERNALS__" in window)) {
+      setMessage({ kind: "error", text: "Update checks only run in the installed app" });
+      return;
+    }
+    setCheckingUpdates(true);
+    try {
+      const found = await findUpdate();
+      if (!found) {
+        setMessage({ kind: "success", text: "You're on the latest version" });
+        return;
+      }
+      const previous = updateRef.current;
+      updateRef.current = found.update;
+      setUpdateOffer(found.offer);
+      setUpdateProgress(null);
+      if (previous && previous !== found.update) void previous.close();
+    } catch (reason) {
+      setMessage({ kind: "error", text: String(reason) });
+    } finally {
+      setCheckingUpdates(false);
+    }
+  };
+
+  const startUpdate = async () => {
+    const pending = updateRef.current;
+    if (!pending) return;
+    setInstallingUpdate(true);
+    setUpdateProgress("Preparing download…");
+    try {
+      await installUpdate(pending, setUpdateProgress);
+    } catch (reason) {
+      setInstallingUpdate(false);
+      setUpdateProgress(null);
+      setMessage({ kind: "error", text: String(reason) });
+    }
+  };
 
   const changeManualOverride = async (presetId: string | null) => {
     const current = dirty ? await persist(config) : config;
@@ -168,6 +247,10 @@ export default function App() {
 
   const activeNavigation = navigation.find((item) => item.id === screen) ?? navigation[0];
   const connection = connectionCopy[snapshot.connection];
+  const live = livePresence(snapshot);
+  const liveLabel = live.presetLabel ?? "No activity";
+  const liveOnDiscord = snapshot.connection === "connected" && live.presetId !== null;
+  const liveKicker = liveOnDiscord ? "NOW LIVE" : live.presetId ? "SELECTED" : "NO ACTIVITY";
 
   return (
     <AppShell
@@ -209,18 +292,21 @@ export default function App() {
         </Stack>
 
         <Box mt="auto" className="sidebar__footer">
-          <Box className="signal-status">
-            <Group gap="xs" wrap="nowrap">
-              <span className={`status-beacon status-beacon--${snapshot.connection}`} />
-              <Box className="signal-status__copy">
-                <Text fw={650} size="xs">{connection.label}</Text>
-                <Text c="dimmed" size="xs" truncate>{snapshot.resolution.presetLabel ?? "No activity"}</Text>
-              </Box>
-            </Group>
-          </Box>
+          <HelpTip label={liveOnDiscord ? `${liveLabel} is on Discord now. ${live.source}.` : `${liveLabel} is selected. ${connectionHelp[snapshot.connection]}`}>
+            <UnstyledButton className="signal-status" type="button" onClick={() => setScreen("dashboard")}>
+              <Group gap="xs" wrap="nowrap" align="flex-start">
+                <span className={`status-beacon status-beacon--${snapshot.connection}`} />
+                <Box className="signal-status__copy">
+                  <Text className="now-live__kicker">{liveKicker}</Text>
+                  <Text fw={750} size="sm" truncate>{liveLabel}</Text>
+                  <Text c="dimmed" size="xs" truncate>{connection.label} · {live.source}</Text>
+                </Box>
+              </Group>
+            </UnstyledButton>
+          </HelpTip>
           <Group justify="space-between" mt="sm">
             <Text c="dimmed" size="10px">LOCAL</Text>
-            <Badge variant="outline" color="gray" size="xs">v0.2.0</Badge>
+            <Badge variant="outline" color="gray" size="xs">v{appVersion}</Badge>
           </Group>
         </Box>
       </AppShell.Navbar>
@@ -236,22 +322,36 @@ export default function App() {
               <Text c="dimmed" size="xs">{activeNavigation.description}</Text>
             </Box>
           </Group>
+          <HelpTip label={liveOnDiscord ? `${liveLabel} is on Discord now. ${live.source}.` : `${liveLabel} is selected, but Discord is not showing it yet. ${live.source}.`}>
+            <UnstyledButton className={`now-live${liveOnDiscord ? "" : " is-empty"}`} type="button" onClick={() => setScreen("dashboard")}>
+              <span className={`status-beacon status-beacon--${snapshot.connection}`} />
+              <span className="now-live__copy">
+                <span className="now-live__kicker">{liveKicker}</span>
+                <strong>{liveLabel}</strong>
+              </span>
+              <Badge size="xs" variant="light" color={liveOnDiscord ? "teal" : "gray"}>{live.source}</Badge>
+            </UnstyledButton>
+          </HelpTip>
           <Group gap="md">
-            <Group gap={7} className="save-state">
-              <span className={dirty ? "save-dot save-dot--dirty" : "save-dot"} />
-              <Text c={dirty ? "yellow.3" : "dimmed"} size="xs">{dirty ? "Unsaved changes" : "Synced locally"}</Text>
-            </Group>
-            <Button
-              size="sm"
-              variant={dirty ? "gradient" : "subtle"}
-              gradient={{ from: "ultraviolet.5", to: "ultraviolet.7", deg: 135 }}
-              leftSection={dirty ? <Save size={15} /> : <Check size={15} />}
-              disabled={!dirty}
-              loading={saving}
-              onClick={() => persist()}
-            >
-              {dirty ? "Save changes" : "Saved"}
-            </Button>
+            <HelpTip label={dirty ? "Discord is still using the last save. Save to publish these edits." : "Discord is using this saved setup."}>
+              <Group gap={7} className="save-state">
+                <span className={dirty ? "save-dot save-dot--dirty" : "save-dot"} />
+                <Text c={dirty ? "yellow.3" : "dimmed"} size="xs">{dirty ? "Unsaved changes" : "Synced locally"}</Text>
+              </Group>
+            </HelpTip>
+            <HelpTip label={dirty ? "Write the edits and send the chosen presence to Discord." : "Nothing new to send."}>
+              <Button
+                size="sm"
+                variant={dirty ? "gradient" : "subtle"}
+                gradient={{ from: "ultraviolet.5", to: "ultraviolet.7", deg: 135 }}
+                leftSection={dirty ? <Save size={15} /> : <Check size={15} />}
+                disabled={!dirty}
+                loading={saving}
+                onClick={() => persist()}
+              >
+                {dirty ? "Save changes" : "Saved"}
+              </Button>
+            </HelpTip>
           </Group>
         </Group>
       </AppShell.Header>
@@ -261,12 +361,14 @@ export default function App() {
         <div className="ambient ambient--two" />
         <div className="workspace__content">
           {screen === "dashboard" && <Dashboard config={config} snapshot={snapshot} onManualOverride={changeManualOverride} onNavigateSettings={() => setScreen("settings")} />}
-          {screen === "presets" && <PresetsScreen config={config} onChange={setConfig} onResetTimer={resetTimer} />}
-          {screen === "rules" && <RulesScreen config={config} onChange={setConfig} />}
+          {screen === "presets" && <PresetsScreen config={config} livePresetId={live.presetId} published={liveOnDiscord} onChange={setConfig} onResetTimer={resetTimer} />}
+          {screen === "rules" && <RulesScreen config={config} liveRuleId={live.ruleId} livePresetLabel={live.presetLabel} onChange={setConfig} />}
           {screen === "settings" && (
             <SettingsScreen
               config={config}
+              checkingUpdates={checkingUpdates}
               onChange={setConfig}
+              onCheckForUpdates={checkForUpdates}
               onImport={async (path) => {
                 try {
                   const imported = await api.importConfig(path);
@@ -292,6 +394,21 @@ export default function App() {
         </div>
       </AppShell.Main>
 
+      <Modal opened={updateOffer !== null} onClose={dismissUpdate} title="Update available" centered radius="xl" closeOnClickOutside={!installingUpdate} closeOnEscape={!installingUpdate} withCloseButton={!installingUpdate}>
+        <Stack gap="md">
+          <Text size="sm">ActivityMux {updateOffer?.version} is ready. It will restart after installing.</Text>
+          {updateOffer?.notes && (
+            <ScrollArea.Autosize mah={160}>
+              <Text c="dimmed" size="sm" style={{ whiteSpace: "pre-wrap" }}>{updateOffer.notes}</Text>
+            </ScrollArea.Autosize>
+          )}
+          {updateProgress && <Text size="sm">{updateProgress}</Text>}
+          <Group justify="flex-end">
+            <Button variant="subtle" color="gray" disabled={installingUpdate} onClick={dismissUpdate}>Not now</Button>
+            <Button variant="gradient" gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }} loading={installingUpdate} onClick={() => void startUpdate()}>Install and restart</Button>
+          </Group>
+        </Stack>
+      </Modal>
       {message && (
         <Notification
           className="app-notification"

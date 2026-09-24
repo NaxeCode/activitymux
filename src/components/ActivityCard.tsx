@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Group, Paper, Stack, Text, ThemeIcon } from "@mantine/core";
+import { HelpTip } from "./HelpTip";
 import { Clock3, ImageOff } from "lucide-react";
 import type { Preset } from "../types";
 
@@ -76,7 +77,7 @@ export function ActivityCard({ preset, compact = false }: ActivityCardProps) {
       </Group>
       {activity.buttons.length > 0 && (
         <Group className="activity-card__buttons" grow mt="md" gap="xs">
-          {activity.buttons.map((button, index) => <Button key={`${button.label}-${index}`} variant="light" color="gray" size="xs" disabled>{button.label}</Button>)}
+          {activity.buttons.map((button, index) => <HelpTip fill key={`${button.label}-${index}`} label="Shown on the Discord profile. This preview button does not open the link."><Button variant="light" color="gray" size="xs" disabled>{button.label}</Button></HelpTip>)}
         </Group>
       )}
     </Paper>

@@ -15,6 +15,8 @@ import {
   Title,
 } from "@mantine/core";
 import { AlertTriangle, Check, Pin, PinOff, Radio, Settings2, Sparkles, Workflow } from "lucide-react";
+import { HelpTip } from "./HelpTip";
+import { connectionHelp } from "../explain";
 import type { AppConfig, ServiceSnapshot } from "../types";
 import { ActivityCard } from "./ActivityCard";
 
@@ -27,10 +29,19 @@ interface DashboardProps {
 
 function reasonText(snapshot: ServiceSnapshot) {
   switch (snapshot.resolution.reason.kind) {
-    case "manual": return "Pinned manual override";
-    case "processRule": return `${snapshot.resolution.reason.ruleLabel} · priority ${snapshot.resolution.reason.priority}`;
-    case "default": return "Default preset";
-    case "none": return "No rule or default matched";
+    case "manual": return "Pinned. Running programs are ignored until you release it.";
+    case "processRule": return `${snapshot.resolution.reason.ruleLabel} matched at priority ${snapshot.resolution.reason.priority}.`;
+    case "default": return "No pin and no matching rule, so the default preset is on.";
+    case "none": return "Nothing is pinned, no rule matched, and there is no default. Presence is cleared.";
+  }
+}
+
+function activeStep(snapshot: ServiceSnapshot) {
+  switch (snapshot.resolution.reason.kind) {
+    case "manual": return 0;
+    case "processRule": return 1;
+    case "default": return 2;
+    case "none": return 3;
   }
 }
 
@@ -64,20 +75,22 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
     <div className="screen dashboard">
       <header className="screen-header hero-header">
         <Box>
-          <Badge variant="light" color="ultraviolet" size="sm" mb="sm">CURRENT</Badge>
-          <Title order={1}>Current presence</Title>
-          <Text c="dimmed" mt="xs">Published to Discord.</Text>
+          <Badge variant="light" color={snapshot.connection === "connected" && resolvedPreset ? "teal" : "gray"} size="sm" mb="sm">{snapshot.connection === "connected" && resolvedPreset ? "NOW LIVE" : resolvedPreset ? "SELECTED" : "NO ACTIVITY"}</Badge>
+          <Title order={1}>{resolvedPreset?.label ?? "No activity"}</Title>
+          <Text c="dimmed" mt="xs">{reasonText(snapshot)}</Text>
         </Box>
-        <Badge
-          className="connection-pill"
-          color={connection.color}
-          variant="light"
-          size="lg"
-          radius="xl"
-          leftSection={<Radio size={14} />}
-        >
-          {connection.label}
-        </Badge>
+        <HelpTip label={connectionHelp[snapshot.connection]}>
+          <Badge
+            className="connection-pill"
+            color={connection.color}
+            variant="light"
+            size="lg"
+            radius="xl"
+            leftSection={<Radio size={14} />}
+          >
+            {connection.label}
+          </Badge>
+        </HelpTip>
       </header>
 
       {snapshot.connection === "setupRequired" && (
@@ -90,7 +103,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
           withCloseButton={false}
         >
           <Group justify="space-between" align="center">
-            <Text size="sm">Required before ActivityMux can publish.</Text>
+            <Text size="sm">Discord uses that application's name as the title. No bot token is needed.</Text>
             <Button variant="light" color="yellow" size="xs" rightSection={<Settings2 size={15} />} onClick={onNavigateSettings}>Open settings</Button>
           </Group>
         </Alert>
@@ -100,13 +113,14 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
         <Paper className="glass-panel live-panel" p="xl" radius="xl">
           <Group justify="space-between" mb="lg">
             <Box>
-              <Text className="eyebrow" c="dimmed">PREVIEW</Text>
+              <Text className="eyebrow" c="teal.3">DISCORD IS USING</Text>
               <Title order={2} mt={4}>{resolvedPreset?.label ?? "Nothing selected"}</Title>
             </Box>
-            {isPinned && <Badge variant="gradient" gradient={{ from: "ultraviolet.5", to: "pink.6" }} leftSection={<Pin size={12} />}>Pinned</Badge>}
+            {isPinned && <HelpTip label="A pin ignores process rules and the default until you release it."><Badge variant="gradient" gradient={{ from: "ultraviolet.5", to: "pink.6" }} leftSection={<Pin size={12} />}>Pinned</Badge></HelpTip>}
           </Group>
 
           <ActivityCard preset={resolvedPreset} />
+          <Text c="dimmed" size="xs" mt="sm">Local preview. Discord's title comes from the application name in the Developer Portal, not from this card.</Text>
 
           <Paper className="resolution-box" radius="lg" p="md" mt="lg">
             <Group align="flex-start" wrap="nowrap">
@@ -137,6 +151,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
             </Group>
             <Select
               label="Preset"
+              description="Forces this activity until you release it. Process rules are ignored."
               placeholder="Choose a preset"
               data={config.presets.map((preset) => ({ value: preset.id, label: preset.label }))}
               value={selection}
@@ -145,19 +160,23 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
               mb="md"
             />
             <SimpleGrid cols={2} spacing="sm">
-              <Button
-                variant="gradient"
-                gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }}
-                leftSection={<Pin size={16} />}
-                disabled={!selection}
-                loading={busy}
-                onClick={() => updateOverride(selection)}
-              >
-                {isPinned ? "Change pin" : "Pin preset"}
-              </Button>
-              <Button variant="light" color="gray" leftSection={<PinOff size={16} />} disabled={!isPinned || busy} onClick={() => updateOverride(null)}>
-                Release
-              </Button>
+              <HelpTip fill label="Save this pin immediately. It stays on across restarts until you release it.">
+                <Button
+                  variant="gradient"
+                  gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }}
+                  leftSection={<Pin size={16} />}
+                  disabled={!selection}
+                  loading={busy}
+                  onClick={() => updateOverride(selection)}
+                >
+                  {isPinned ? "Change pin" : "Pin preset"}
+                </Button>
+              </HelpTip>
+              <HelpTip fill label="Remove the pin now. The highest matching rule, or the default, takes over.">
+                <Button variant="light" color="gray" leftSection={<PinOff size={16} />} disabled={!isPinned || busy} onClick={() => updateOverride(null)}>
+                  Release
+                </Button>
+              </HelpTip>
             </SimpleGrid>
           </Paper>
 
@@ -166,11 +185,11 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
               <Workflow size={17} />
               <Text fw={700} size="sm">Resolution order</Text>
             </Group>
-            <Timeline active={isPinned ? 0 : 1} bulletSize={22} lineWidth={2} color="ultraviolet">
-              <Timeline.Item bullet={<Check size={12} />} title="Manual override"><Text c="dimmed" size="xs">Always wins while pinned</Text></Timeline.Item>
-              <Timeline.Item title="Process priority"><Text c="dimmed" size="xs">Highest matching rule</Text></Timeline.Item>
-              <Timeline.Item title="Default preset"><Text c="dimmed" size="xs">Used when no rule matches</Text></Timeline.Item>
-              <Timeline.Item title="Clear"><Text c="dimmed" size="xs">No fallback configured</Text></Timeline.Item>
+            <Timeline active={activeStep(snapshot)} bulletSize={22} lineWidth={2} color="ultraviolet">
+              <Timeline.Item bullet={<Check size={12} />} title="Manual pin"><Text c="dimmed" size="xs">Forces one preset. Open programs do not matter.</Text></Timeline.Item>
+              <Timeline.Item title="Process rule"><Text c="dimmed" size="xs">Highest matching priority number wins. Ties keep the first saved rule.</Text></Timeline.Item>
+              <Timeline.Item title="Default preset"><Text c="dimmed" size="xs">Used when nothing is pinned and no rule matches.</Text></Timeline.Item>
+              <Timeline.Item title="Clear"><Text c="dimmed" size="xs">Removes the activity when no default is set.</Text></Timeline.Item>
             </Timeline>
           </Paper>
         </Stack>

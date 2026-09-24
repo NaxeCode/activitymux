@@ -33,6 +33,12 @@ Discord takes the activity title and uploaded artwork from that application. A p
 
 ActivityMux controls only the presence it publishes. Discord game detection, Spotify, consoles, and other connected services remain separate.
 
+## Updates
+
+Installed copies check GitHub Releases on startup and from Settings, then ask before downloading. Windows updates through the current-user NSIS installer. Linux updates the AppImage. The `.deb` package does not update itself.
+
+Publish by tagging `vX.Y.Z` after that same version is set in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`. The tag workflow signs the installers and uploads `latest.json`. The private key is the `TAURI_SIGNING_PRIVATE_KEY` repository secret, with a local backup at `~/.tauri/activitymux.key`. Do not commit it. Losing both copies means installed apps cannot verify later updates.
+
 ## Build
 
 Requires Node.js 22, Rust stable, and the [Tauri 2 prerequisites](https://v2.tauri.app/start/prerequisites/).

@@ -14,6 +14,31 @@ use tauri::tray::TrayIconBuilder;
 use tauri::{Manager, WindowEvent};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
+fn autostart_already_disabled(message: &str) -> bool {
+    let message = message.to_ascii_lowercase();
+    message.contains("os error 2") || message.contains("cannot find the file specified")
+}
+
+fn sync_launch_at_login(app: &tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    let autostart = app.autolaunch();
+    if let Ok(current) = autostart.is_enabled() {
+        if current == enabled {
+            return Ok(());
+        }
+    }
+
+    let result = if enabled {
+        autostart.enable()
+    } else {
+        autostart.disable()
+    };
+    match result {
+        Ok(()) => Ok(()),
+        Err(error) if !enabled && autostart_already_disabled(&error.to_string()) => Ok(()),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
 #[tauri::command]
 fn get_config(state: tauri::State<'_, AppState>) -> AppConfig {
     state
@@ -24,7 +49,21 @@ fn get_config(state: tauri::State<'_, AppState>) -> AppConfig {
 }
 
 #[tauri::command]
-fn save_config(config: AppConfig, state: tauri::State<'_, AppState>) -> Result<AppConfig, String> {
+fn save_config(
+    config: AppConfig,
+    app: tauri::AppHandle,
+    state: tauri::State<'_, AppState>,
+) -> Result<AppConfig, String> {
+    let launch_at_login_changed = state
+        .config
+        .read()
+        .expect("configuration lock poisoned")
+        .settings
+        .launch_at_login
+        != config.settings.launch_at_login;
+    if launch_at_login_changed {
+        sync_launch_at_login(&app, config.settings.launch_at_login)?;
+    }
     state
         .store
         .save(&config)
@@ -86,11 +125,18 @@ fn reset_persistent_timer(
 }
 
 #[tauri::command]
-fn import_config(path: String, state: tauri::State<'_, AppState>) -> Result<AppConfig, String> {
+fn import_config(
+    path: String,
+    app: tauri::AppHandle,
+    state: tauri::State<'_, AppState>,
+) -> Result<AppConfig, String> {
     let config = state
         .store
         .import(&PathBuf::from(path))
         .map_err(|error| error.to_string())?;
+    if let Err(error) = sync_launch_at_login(&app, config.settings.launch_at_login) {
+        eprintln!("ActivityMux could not sync launch at login after import: {error}");
+    }
     *state.config.write().expect("configuration lock poisoned") = config.clone();
     Ok(config)
 }
@@ -148,6 +194,8 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
@@ -166,11 +214,8 @@ pub fn run() {
             let state = AppState::new(config, store);
             app.manage(state.clone());
 
-            let autostart = app.autolaunch();
-            if should_autostart {
-                let _ = autostart.enable();
-            } else {
-                let _ = autostart.disable();
+            if let Err(error) = sync_launch_at_login(app.handle(), should_autostart) {
+                eprintln!("ActivityMux could not sync launch at login: {error}");
             }
 
             build_tray(app)?;
@@ -209,4 +254,17 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running ActivityMux");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::autostart_already_disabled;
+
+    #[test]
+    fn windows_missing_autostart_entry_is_already_disabled() {
+        assert!(autostart_already_disabled(
+            "The system cannot find the file specified. (os error 2)"
+        ));
+        assert!(!autostart_already_disabled("Access is denied. (os error 5)"));
+    }
 }

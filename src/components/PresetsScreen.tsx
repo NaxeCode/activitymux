@@ -15,21 +15,36 @@ import {
   TextInput,
   ThemeIcon,
   Title,
-  Tooltip,
   UnstyledButton,
 } from "@mantine/core";
 import { Clock3, Copy, Image, Link2, Plus, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import type { AppConfig, Preset, TimerMode } from "../types";
 import { ActivityCard } from "./ActivityCard";
+import { HelpTip } from "./HelpTip";
 
 interface PresetsScreenProps {
   config: AppConfig;
+  livePresetId: string | null;
+  published: boolean;
   onChange: (config: AppConfig) => void;
   onResetTimer: (presetId: string) => Promise<void>;
 }
 
 const nowSeconds = () => Math.floor(Date.now() / 1_000);
 
+function localDateTimeValue(seconds: number) {
+  const date = new Date(seconds * 1_000);
+  if (Number.isNaN(date.getTime())) return "";
+  const shifted = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return shifted.toISOString().slice(0, 16);
+}
+
+const timerHelp = {
+  disabled: "No elapsed time is sent to Discord.",
+  session: "Starts when this preset becomes active. Leaving and coming back starts it over.",
+  persistent: "Keeps counting from the start time, including after ActivityMux restarts.",
+  fixed: "Counts from the date you pick. Switching away does not restart it.",
+} as const;
 function blankPreset(): Preset {
   return {
     id: crypto.randomUUID(),
@@ -60,7 +75,7 @@ function timerForKind(kind: TimerMode["kind"]): TimerMode {
   }
 }
 
-export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenProps) {
+export function PresetsScreen({ config, livePresetId, published, onChange, onResetTimer }: PresetsScreenProps) {
   const [selectedId, setSelectedId] = useState(config.presets[0]?.id ?? "");
 
   useEffect(() => {
@@ -112,7 +127,7 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
         <Box>
           <Badge variant="light" color="ultraviolet" size="sm" mb="sm">PRESETS</Badge>
           <Title order={1}>Presets</Title>
-          <Text c="dimmed" mt="xs">Discord activity presets.</Text>
+          <Text c="dimmed" mt="xs">A preset is one activity. Discord takes the title from the application ID, not from the name in this list.</Text>
         </Box>
         <Button variant="gradient" gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }} leftSection={<Plus size={16} />} onClick={addPreset}>Add preset</Button>
       </header>
@@ -128,15 +143,15 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
               {config.presets.map((preset, index) => (
                 <UnstyledButton
                   key={preset.id}
-                  className={`preset-list__item${preset.id === selectedId ? " is-active" : ""}`}
+                  className={`preset-list__item${preset.id === selectedId ? " is-selected" : ""}${preset.id === livePresetId ? " is-live" : ""}`}
                   onClick={() => setSelectedId(preset.id)}
                 >
-                  <ThemeIcon className="preset-avatar" variant={preset.id === selectedId ? "gradient" : "light"} gradient={{ from: "ultraviolet.4", to: "signal.5" }} color="gray" size={38} radius="md">
+                  <ThemeIcon className="preset-avatar" variant={preset.id === livePresetId ? "filled" : preset.id === selectedId ? "gradient" : "light"} color={preset.id === livePresetId ? "teal" : "gray"} gradient={{ from: "ultraviolet.4", to: "signal.5" }} size={38} radius="md">
                     {String(index + 1).padStart(2, "0")}
                   </ThemeIcon>
                   <Box className="preset-list__copy">
                     <Text fw={650} size="sm" truncate>{preset.label}</Text>
-                    <Text c="dimmed" size="xs" truncate>{preset.activity.name}</Text>
+                    <Text c={preset.id === livePresetId ? "teal.3" : "dimmed"} size="xs" truncate>{preset.id === livePresetId ? (published ? "Live on Discord" : "Selected") : preset.activity.name}</Text>
                   </Box>
                 </UnstyledButton>
               ))}
@@ -149,12 +164,16 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
           <Paper className="glass-panel preset-editor" radius="xl" p="lg">
             <Group justify="space-between" mb="md">
               <Box>
-                <Text className="eyebrow" c="dimmed">SELECTED</Text>
+                <Group gap="xs">
+                  <Text className="eyebrow" c="dimmed">SELECTED</Text>
+                  {selected.id === livePresetId && <Badge color="teal" variant="light" size="xs">{published ? "Live on Discord" : "Selected"}</Badge>}
+                </Group>
                 <Title order={2}>{selected.label}</Title>
+                {selected.id !== livePresetId && <Text c="dimmed" size="xs" mt={4}>{livePresetId ? "This is not the preset Discord is using." : "Discord is not using a preset."}</Text>}
               </Box>
               <Group gap="xs">
-                <Tooltip label="Duplicate preset"><ActionIcon variant="light" color="gray" size="lg" onClick={duplicatePreset}><Copy size={16} /></ActionIcon></Tooltip>
-                <Tooltip label="Delete preset"><ActionIcon variant="light" color="red" size="lg" onClick={deletePreset}><Trash2 size={16} /></ActionIcon></Tooltip>
+                <HelpTip label="Copy this preset. Rules and the pin still point at the original."><ActionIcon variant="light" color="gray" size="lg" onClick={duplicatePreset} aria-label="Duplicate preset"><Copy size={16} /></ActionIcon></HelpTip>
+                <HelpTip label="Remove this preset. Save will fail if a rule, pin, or default still uses it."><ActionIcon variant="light" color="red" size="lg" onClick={deletePreset} aria-label="Delete preset"><Trash2 size={16} /></ActionIcon></HelpTip>
               </Group>
             </Group>
 
@@ -163,15 +182,15 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
                 <Accordion.Control icon={<Sparkles size={17} />}>Activity</Accordion.Control>
                 <Accordion.Panel>
                   <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                    <TextInput label="Editor label" value={selected.label} onChange={(event) => updatePreset((preset) => ({ ...preset, label: event.target.value }))} />
-                    <TextInput label="Discord application name" maxLength={128} value={selected.activity.name} onChange={(event) => updateActivity({ name: event.target.value })} />
-                    <Select label="Activity type" data={[{ value: "playing", label: "Playing" }, { value: "listening", label: "Listening to" }, { value: "watching", label: "Watching" }, { value: "competing", label: "Competing in" }]} value={selected.activity.activityType} onChange={(value) => value && updateActivity({ activityType: value as Preset["activity"]["activityType"] })} />
-                    <Select label="Status text" data={[{ value: "name", label: "Discord app name" }, { value: "details", label: "Details" }, { value: "state", label: "State" }]} value={selected.activity.statusDisplayType} onChange={(value) => value && updateActivity({ statusDisplayType: value as Preset["activity"]["statusDisplayType"] })} />
-                    <TextInput className="span-2" label="Application ID override" description="Leave blank to use the ID from Settings" inputMode="numeric" value={selected.activity.discordApplicationId} onChange={(event) => updateActivity({ discordApplicationId: event.target.value.replace(/\D/g, "") })} />
-                    <TextInput className="span-2" label="Details" maxLength={128} value={selected.activity.details} onChange={(event) => updateActivity({ details: event.target.value })} placeholder="Contemplating the Impaler" />
-                    <TextInput className="span-2" label="State" maxLength={128} value={selected.activity.state} onChange={(event) => updateActivity({ state: event.target.value })} placeholder="The flame still burns" />
+                    <TextInput label="Preset name" description="Shown in ActivityMux only. Discord does not use this." value={selected.label} onChange={(event) => updatePreset((preset) => ({ ...preset, label: event.target.value }))} />
+                    <TextInput label="Preview name" description="Shown in the preview card only. Discord's title is the application name from the Developer Portal." maxLength={128} value={selected.activity.name} onChange={(event) => updateActivity({ name: event.target.value })} />
+                    <Select label="Activity type" description="The verb Discord puts in front of the activity." data={[{ value: "playing", label: "Playing" }, { value: "listening", label: "Listening to" }, { value: "watching", label: "Watching" }, { value: "competing", label: "Competing in" }]} value={selected.activity.activityType} onChange={(value) => value && updateActivity({ activityType: value as Preset["activity"]["activityType"] })} />
+                    <Select label="Status text" description="The line Discord shows as your status. App name comes from the portal, not the preview name." data={[{ value: "name", label: "Discord app name" }, { value: "details", label: "Details" }, { value: "state", label: "State" }]} value={selected.activity.statusDisplayType} onChange={(value) => value && updateActivity({ statusDisplayType: value as Preset["activity"]["statusDisplayType"] })} />
+                    <TextInput className="span-2" label="Application ID override" description="Blank uses the ID in Settings. A different ID is how this preset gets its own title and artwork." inputMode="numeric" value={selected.activity.discordApplicationId} onChange={(event) => updateActivity({ discordApplicationId: event.target.value.replace(/\D/g, "") })} />
+                    <TextInput className="span-2" label="Details" description="First line under the title. Up to 128 characters." maxLength={128} value={selected.activity.details} onChange={(event) => updateActivity({ details: event.target.value })} placeholder="Contemplating the Impaler" />
+                    <TextInput className="span-2" label="State" description="Second line. Up to 128 characters." maxLength={128} value={selected.activity.state} onChange={(event) => updateActivity({ state: event.target.value })} placeholder="The flame still burns" />
                   </SimpleGrid>
-                  <Text c="dimmed" size="xs" mt="md">The Discord application ID supplies the title and assets.</Text>
+                  <Text c="dimmed" size="xs" mt="md">Save before Discord sees this. The application ID supplies the title and the artwork set.</Text>
                 </Accordion.Panel>
               </Accordion.Item>
 
@@ -179,10 +198,10 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
                 <Accordion.Control icon={<Image size={17} />}>Artwork</Accordion.Control>
                 <Accordion.Panel>
                   <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                    <TextInput className="span-2" label="Large image URL or asset key" value={selected.activity.largeImage} onChange={(event) => updateActivity({ largeImage: event.target.value })} placeholder="https://… or asset_key" />
-                    <TextInput label="Large image hover text" value={selected.activity.largeText} onChange={(event) => updateActivity({ largeText: event.target.value })} />
-                    <TextInput label="Small image URL or asset key" value={selected.activity.smallImage} onChange={(event) => updateActivity({ smallImage: event.target.value })} />
-                    <TextInput className="span-2" label="Small image hover text" value={selected.activity.smallText} onChange={(event) => updateActivity({ smallText: event.target.value })} />
+                    <TextInput className="span-2" label="Large image" description="Asset key uploaded to that Discord application, or an image URL. This preview only loads URLs." value={selected.activity.largeImage} onChange={(event) => updateActivity({ largeImage: event.target.value })} placeholder="asset_key or https://…" />
+                    <TextInput label="Large hover text" description="Tooltip people see on the large image in Discord." value={selected.activity.largeText} onChange={(event) => updateActivity({ largeText: event.target.value })} />
+                    <TextInput label="Small image" description="Small badge asset key or URL. Also resolved by Discord, not by this preview." value={selected.activity.smallImage} onChange={(event) => updateActivity({ smallImage: event.target.value })} />
+                    <TextInput className="span-2" label="Small hover text" description="Tooltip people see on the small image." value={selected.activity.smallText} onChange={(event) => updateActivity({ smallText: event.target.value })} />
                   </SimpleGrid>
                 </Accordion.Panel>
               </Accordion.Item>
@@ -191,24 +210,25 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
                 <Accordion.Control icon={<Clock3 size={17} />}>Timer</Accordion.Control>
                 <Accordion.Panel>
                   <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                    <Select label="Timer behavior" data={[{ value: "disabled", label: "No timer" }, { value: "session", label: "Reset each activation" }, { value: "persistent", label: "Keep counting across restarts" }, { value: "fixed", label: "Start from a fixed date" }]} value={selected.activity.timer.kind} onChange={(value) => value && updateActivity({ timer: timerForKind(value as TimerMode["kind"]) })} />
+                    <Select label="Timer behavior" description={timerHelp[selected.activity.timer.kind]} data={[{ value: "disabled", label: "No timer" }, { value: "session", label: "Reset each activation" }, { value: "persistent", label: "Keep counting across restarts" }, { value: "fixed", label: "Start from a fixed date" }]} value={selected.activity.timer.kind} onChange={(value) => value && updateActivity({ timer: timerForKind(value as TimerMode["kind"]) })} />
                     {(selected.activity.timer.kind === "persistent" || selected.activity.timer.kind === "fixed") && (
-                      <TextInput label="Start time" type="datetime-local" value={new Date(selected.activity.timer.startedAt * 1_000).toISOString().slice(0, 16)} onChange={(event) => updateActivity({ timer: { kind: selected.activity.timer.kind as "persistent" | "fixed", startedAt: Math.floor(new Date(event.target.value).getTime() / 1_000) } })} />
+                      <TextInput label="Start time" description="Local time. Discord counts elapsed time from this moment." type="datetime-local" value={localDateTimeValue(selected.activity.timer.startedAt)} onChange={(event) => updateActivity({ timer: { kind: selected.activity.timer.kind as "persistent" | "fixed", startedAt: Math.floor(new Date(event.target.value).getTime() / 1_000) } })} />
                     )}
                   </SimpleGrid>
-                  {selected.activity.timer.kind === "persistent" && <Button mt="md" variant="light" color="gray" leftSection={<RotateCcw size={15} />} onClick={() => onResetTimer(selected.id)}>Reset to now</Button>}
+                  {selected.activity.timer.kind === "persistent" && <HelpTip label="Sets the stored start to now and saves immediately."><Button mt="md" variant="light" color="gray" leftSection={<RotateCcw size={15} />} onClick={() => onResetTimer(selected.id)}>Reset to now</Button></HelpTip>}
                 </Accordion.Panel>
               </Accordion.Item>
 
               <Accordion.Item value="buttons">
                 <Accordion.Control icon={<Link2 size={17} />}>Buttons <Text span c="dimmed" size="xs">({selected.activity.buttons.length}/2)</Text></Accordion.Control>
                 <Accordion.Panel>
+                  <Text c="dimmed" size="sm" mb="sm">Discord shows up to two links on the profile. They are not clickable in this preview, and each URL must start with http:// or https://.</Text>
                   <Stack gap="sm">
                     {selected.activity.buttons.map((button, index) => (
                       <Group key={index} wrap="nowrap" align="flex-end">
                         <TextInput label="Label" maxLength={32} value={button.label} onChange={(event) => updateActivity({ buttons: selected.activity.buttons.map((item, buttonIndex) => buttonIndex === index ? { ...item, label: event.target.value } : item) })} placeholder="Learn more" flex={1} />
                         <TextInput label="URL" value={button.url} onChange={(event) => updateActivity({ buttons: selected.activity.buttons.map((item, buttonIndex) => buttonIndex === index ? { ...item, url: event.target.value } : item) })} placeholder="https://…" flex={2} />
-                        <ActionIcon color="red" variant="light" size={36} onClick={() => updateActivity({ buttons: selected.activity.buttons.filter((_, buttonIndex) => buttonIndex !== index) })}><Trash2 size={15} /></ActionIcon>
+                        <HelpTip label="Remove this button. Save before Discord drops it."><ActionIcon color="red" variant="light" size={36} onClick={() => updateActivity({ buttons: selected.activity.buttons.filter((_, buttonIndex) => buttonIndex !== index) })} aria-label="Remove button"><Trash2 size={15} /></ActionIcon></HelpTip>
                       </Group>
                     ))}
                     {selected.activity.buttons.length < 2 && <Button variant="light" color="gray" leftSection={<Plus size={15} />} onClick={() => updateActivity({ buttons: [...selected.activity.buttons, { label: "Learn more", url: "https://" }] })}>Add button</Button>}
@@ -222,9 +242,9 @@ export function PresetsScreen({ config, onChange, onResetTimer }: PresetsScreenP
         )}
 
         <aside className="preview-column">
-          <Group justify="space-between" mb="sm"><Text className="eyebrow" c="dimmed">LIVE PREVIEW</Text><Badge color="teal" variant="dot">SYNCED</Badge></Group>
+          <Group justify="space-between" mb="sm"><Text className="eyebrow" c="dimmed">LOCAL PREVIEW</Text><HelpTip label="This card is drawn here. It is not a live view of your Discord profile."><Badge color="gray" variant="dot">Local only</Badge></HelpTip></Group>
           <ActivityCard preset={selected} compact />
-          <Text c="dimmed" size="xs" mt="sm">Discord resolves asset keys.</Text>
+          <Text c="dimmed" size="xs" mt="sm">Local preview. Discord uses the portal application name as the title and resolves artwork keys there.</Text>
         </aside>
       </div>
     </div>

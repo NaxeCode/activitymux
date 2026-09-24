@@ -13,6 +13,10 @@ dist-ssr
 *.local
 release-artifacts/
 
+# Tauri updater private keys must never be committed.
+*.key
+src-tauri/*.key
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

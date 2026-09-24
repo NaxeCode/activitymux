@@ -49,11 +49,13 @@ export function ProcessPicker({ open, onClose, onSelect }: ProcessPickerProps) {
       overlayProps={{ backgroundOpacity: 0.72, blur: 8 }}
       classNames={{ content: "process-modal", header: "process-modal__header" }}
     >
+      <Text c="dimmed" size="sm" mb="md">The path helps you recognize the program. The rule stores the process name only. Matching ignores case and a trailing .exe. On Linux that name can be shortened to 15 characters, so pick the name shown here.</Text>
       <TextInput
         autoFocus
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search by process or path"
+        description="Search includes the path, but the saved rule does not."
         leftSection={<Search size={16} />}
         size="md"
         mb="md"
