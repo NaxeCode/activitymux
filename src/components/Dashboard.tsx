@@ -48,7 +48,7 @@ function activeStep(snapshot: ServiceSnapshot) {
 const connectionLabels = {
   setupRequired: { label: "Setup required", color: "yellow" },
   connecting: { label: "Connecting", color: "blue" },
-  connected: { label: "Signal live", color: "teal" },
+  connected: { label: "Signal live", color: "signal" },
   disconnected: { label: "Disconnected", color: "red" },
 } as const;
 
@@ -75,7 +75,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
     <div className="screen dashboard">
       <header className="screen-header hero-header">
         <Box>
-          <Badge variant="light" color={snapshot.connection === "connected" && resolvedPreset ? "teal" : "gray"} size="sm" mb="sm">{snapshot.connection === "connected" && resolvedPreset ? "NOW LIVE" : resolvedPreset ? "SELECTED" : "NO ACTIVITY"}</Badge>
+          <Badge variant="light" color={snapshot.connection === "connected" && resolvedPreset ? "signal" : "gray"} size="sm" mb="sm">{snapshot.connection === "connected" && resolvedPreset ? "NOW LIVE" : resolvedPreset ? "SELECTED" : "NO ACTIVITY"}</Badge>
           <Title order={1}>{resolvedPreset?.label ?? "No activity"}</Title>
           <Text c="dimmed" mt="xs">{reasonText(snapshot)}</Text>
         </Box>
@@ -113,10 +113,10 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
         <Paper className="glass-panel live-panel" p="xl" radius="xl">
           <Group justify="space-between" mb="lg">
             <Box>
-              <Text className="eyebrow" c="teal.3">DISCORD IS USING</Text>
+              <Text className="eyebrow tone-signal">DISCORD IS USING</Text>
               <Title order={2} mt={4}>{resolvedPreset?.label ?? "Nothing selected"}</Title>
             </Box>
-            {isPinned && <HelpTip label="A pin ignores process rules and the default until you release it."><Badge variant="gradient" gradient={{ from: "ultraviolet.5", to: "pink.6" }} leftSection={<Pin size={12} />}>Pinned</Badge></HelpTip>}
+            {isPinned && <HelpTip label="A pin ignores process rules and the default until you release it."><Badge variant="gradient" gradient={{ from: "accent.5", to: "signal.5" }} leftSection={<Pin size={12} />}>Pinned</Badge></HelpTip>}
           </Group>
 
           <ActivityCard preset={resolvedPreset} />
@@ -124,14 +124,14 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
 
           <Paper className="resolution-box" radius="lg" p="md" mt="lg">
             <Group align="flex-start" wrap="nowrap">
-              <ThemeIcon variant="gradient" gradient={{ from: "ultraviolet.5", to: "signal.5" }} radius="md">
+              <ThemeIcon variant="gradient" gradient={{ from: "accent.5", to: "signal.5" }} radius="md">
                 <Sparkles size={16} />
               </ThemeIcon>
               <Box>
                 <Text fw={700} size="sm">Selected by</Text>
                 <Text c="dimmed" size="sm">{reasonText(snapshot)}</Text>
                 {snapshot.resolution.reason.kind === "processRule" && (
-                  <Text c="ultraviolet.2" size="xs" mt={4}>Matched {snapshot.resolution.reason.matchedProcesses.join(", ")}</Text>
+                  <Text className="tone-accent" size="xs" mt={4}>Matched {snapshot.resolution.reason.matchedProcesses.join(", ")}</Text>
                 )}
               </Box>
             </Group>
@@ -143,7 +143,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
         <Stack gap="lg">
           <Paper className="glass-panel override-panel" p="xl" radius="xl">
             <Group gap="sm" mb="xs">
-              <ThemeIcon variant="light" color="ultraviolet" radius="md"><Pin size={17} /></ThemeIcon>
+              <ThemeIcon variant="light" color="accent" radius="md"><Pin size={17} /></ThemeIcon>
               <Box>
                 <Text className="eyebrow" c="dimmed">OVERRIDE</Text>
                 <Title order={3}>Manual override</Title>
@@ -163,7 +163,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
               <HelpTip fill label="Save this pin immediately. It stays on across restarts until you release it.">
                 <Button
                   variant="gradient"
-                  gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }}
+                  gradient={{ from: "accent.5", to: "accent.7" }}
                   leftSection={<Pin size={16} />}
                   disabled={!selection}
                   loading={busy}
@@ -185,7 +185,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
               <Workflow size={17} />
               <Text fw={700} size="sm">Resolution order</Text>
             </Group>
-            <Timeline active={activeStep(snapshot)} bulletSize={22} lineWidth={2} color="ultraviolet">
+            <Timeline active={activeStep(snapshot)} bulletSize={22} lineWidth={2} color="accent">
               <Timeline.Item bullet={<Check size={12} />} title="Manual pin"><Text c="dimmed" size="xs">Forces one preset. Open programs do not matter.</Text></Timeline.Item>
               <Timeline.Item title="Process rule"><Text c="dimmed" size="xs">Highest matching priority number wins. Ties keep the first saved rule.</Text></Timeline.Item>
               <Timeline.Item title="Default preset"><Text c="dimmed" size="xs">Used when nothing is pinned and no rule matches.</Text></Timeline.Item>

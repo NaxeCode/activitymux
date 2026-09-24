@@ -1,0 +1,501 @@
+:root {
+  color-scheme: dark;
+  --mux-bg: #07080d;
+  --mux-sidebar: rgba(8, 9, 15, .94);
+  --mux-topbar: rgba(8, 9, 15, .78);
+  --mux-surface: rgba(24, 25, 38, .84);
+  --mux-surface-2: rgba(13, 14, 23, .77);
+  --mux-inset: rgba(6, 7, 12, .42);
+  --mux-hover: rgba(255, 255, 255, .035);
+  --mux-line: rgba(170, 151, 255, .13);
+  --mux-line-strong: rgba(170, 151, 255, .25);
+  --mux-accent: #9d63ff;
+  --mux-accent-soft: rgba(141, 71, 250, .16);
+  --mux-accent-ink: #d0bcff;
+  --mux-signal: #2be7ca;
+  --mux-signal-soft: rgba(43, 231, 202, .16);
+  --mux-signal-line: rgba(43, 231, 202, .5);
+  --mux-signal-ink: #2be7ca;
+  --mux-muted: #8c8fa3;
+  --mux-ink: #f4f6fb;
+  --mux-grid: rgba(255, 255, 255, .017);
+  --mux-ambient-1: #8d47fa;
+  --mux-ambient-2: #14cdb2;
+  --mux-ambient-opacity: .11;
+  --mux-card: #20222d;
+  --mux-card-2: #171821;
+  --mux-card-border: rgba(255, 255, 255, .07);
+  --mux-card-glow: rgba(157, 99, 255, .13);
+  --mux-fallback-1: #9d63ff;
+  --mux-fallback-2: #5b25ad;
+  --mux-fallback-3: #087b70;
+  --mux-shadow: 0 18px 70px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  --mux-modal: rgba(15, 16, 25, .97);
+  --mux-toast: rgba(20, 21, 32, .96);
+  --mux-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: none;
+  --mux-pattern-opacity: 0;
+  --mux-warn: #ffd166;
+  --mux-danger: #ff6685;
+}
+
+html[data-scheme="light"] { color-scheme: light; --mux-warn: #8a5a00; --mux-danger: #c4234a; }
+html[data-scheme="dark"] { color-scheme: dark; --mux-warn: #ffd166; --mux-danger: #ff6685; }
+
+html[data-aesthetic="signal"] {
+  --mux-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: none;
+}
+html[data-aesthetic="signal"][data-scheme="dark"] {
+  --mux-bg: #07080d;
+  --mux-sidebar: rgba(8, 9, 15, .94);
+  --mux-topbar: rgba(8, 9, 15, .78);
+  --mux-surface: rgba(24, 25, 38, .84);
+  --mux-surface-2: rgba(13, 14, 23, .77);
+  --mux-inset: rgba(6, 7, 12, .42);
+  --mux-hover: rgba(255, 255, 255, .035);
+  --mux-line: rgba(170, 151, 255, .13);
+  --mux-line-strong: rgba(170, 151, 255, .25);
+  --mux-accent: #9d63ff;
+  --mux-accent-soft: rgba(141, 71, 250, .16);
+  --mux-accent-ink: #d0bcff;
+  --mux-signal: #2be7ca;
+  --mux-signal-soft: rgba(43, 231, 202, .16);
+  --mux-signal-line: rgba(43, 231, 202, .5);
+  --mux-signal-ink: #2be7ca;
+  --mux-muted: #8c8fa3;
+  --mux-ink: #f4f6fb;
+  --mux-grid: rgba(255, 255, 255, .017);
+  --mux-ambient-1: #8d47fa;
+  --mux-ambient-2: #14cdb2;
+  --mux-card: #20222d;
+  --mux-card-2: #171821;
+  --mux-card-border: rgba(255, 255, 255, .07);
+  --mux-card-glow: rgba(157, 99, 255, .13);
+  --mux-fallback-1: #9d63ff;
+  --mux-fallback-2: #5b25ad;
+  --mux-fallback-3: #087b70;
+  --mux-shadow: 0 18px 70px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  --mux-modal: rgba(15, 16, 25, .97);
+  --mux-toast: rgba(20, 21, 32, .96);
+}
+html[data-aesthetic="signal"][data-scheme="light"] {
+  --mux-bg: #f5f3fb;
+  --mux-sidebar: rgba(255, 252, 255, .9);
+  --mux-topbar: rgba(255, 252, 255, .84);
+  --mux-surface: rgba(255, 255, 255, .9);
+  --mux-surface-2: rgba(247, 245, 252, .92);
+  --mux-inset: rgba(247, 245, 252, .9);
+  --mux-hover: rgba(88, 54, 160, .06);
+  --mux-line: rgba(91, 37, 173, .14);
+  --mux-line-strong: rgba(91, 37, 173, .28);
+  --mux-accent: #6c2bd4;
+  --mux-accent-soft: rgba(108, 43, 212, .1);
+  --mux-accent-ink: #5b25ad;
+  --mux-signal: #078878;
+  --mux-signal-soft: rgba(7, 136, 120, .12);
+  --mux-signal-line: rgba(7, 136, 120, .45);
+  --mux-signal-ink: #086d61;
+  --mux-muted: #5c5f72;
+  --mux-ink: #1b1630;
+  --mux-grid: rgba(80, 50, 140, .045);
+  --mux-ambient-1: #8d47fa;
+  --mux-ambient-2: #14cdb2;
+  --mux-ambient-opacity: .16;
+  --mux-card: #ffffff;
+  --mux-card-2: #f6f4fb;
+  --mux-card-border: rgba(91, 37, 173, .14);
+  --mux-card-glow: rgba(141, 71, 250, .1);
+  --mux-fallback-1: #8d47fa;
+  --mux-fallback-2: #5b25ad;
+  --mux-fallback-3: #087b70;
+  --mux-shadow: 0 16px 40px rgba(40, 20, 80, .08);
+  --mux-modal: rgba(255, 255, 255, .98);
+  --mux-toast: rgba(255, 255, 255, .98);
+}
+
+html[data-aesthetic="storybook"] {
+  --mux-font: Palatino, "Palatino Linotype", "Iowan Old Style", Georgia, serif;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: radial-gradient(circle, rgba(240, 212, 138, .85) 1px, transparent 1.5px) 0 0 / 54px 54px, radial-gradient(circle, rgba(255, 255, 255, .8) 1px, transparent 1.3px) 22px 30px / 86px 86px;
+}
+html[data-aesthetic="storybook"][data-scheme="dark"] {
+  --mux-bg: #07111f;
+  --mux-sidebar: rgba(8, 18, 32, .9);
+  --mux-topbar: rgba(8, 18, 32, .78);
+  --mux-surface: rgba(14, 30, 52, .86);
+  --mux-surface-2: rgba(8, 20, 36, .82);
+  --mux-inset: rgba(6, 16, 30, .55);
+  --mux-hover: rgba(244, 239, 230, .05);
+  --mux-line: rgba(244, 226, 184, .16);
+  --mux-line-strong: rgba(244, 226, 184, .32);
+  --mux-accent: #9bb8e0;
+  --mux-accent-soft: rgba(155, 184, 224, .16);
+  --mux-accent-ink: #f0d48a;
+  --mux-signal: #e4c15a;
+  --mux-signal-soft: rgba(228, 193, 90, .14);
+  --mux-signal-line: rgba(228, 193, 90, .55);
+  --mux-signal-ink: #f0d48a;
+  --mux-muted: #b7c3d4;
+  --mux-ink: #f4efe6;
+  --mux-grid: transparent;
+  --mux-ambient-1: #1d4e89;
+  --mux-ambient-2: #e4c15a;
+  --mux-card: #12243a;
+  --mux-card-2: #0c1b2e;
+  --mux-card-border: rgba(244, 226, 184, .18);
+  --mux-card-glow: rgba(240, 212, 138, .12);
+  --mux-fallback-1: #f4efe6;
+  --mux-fallback-2: #4d7dba;
+  --mux-fallback-3: #1a334f;
+  --mux-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+  --mux-modal: rgba(10, 22, 40, .97);
+  --mux-toast: rgba(10, 22, 40, .96);
+  --mux-pattern-opacity: .35;
+}
+html[data-aesthetic="storybook"][data-scheme="light"] {
+  --mux-bg: #f7f1e4;
+  --mux-sidebar: rgba(255, 250, 242, .9);
+  --mux-topbar: rgba(255, 250, 242, .84);
+  --mux-surface: rgba(255, 252, 247, .9);
+  --mux-surface-2: rgba(247, 241, 228, .92);
+  --mux-inset: rgba(255, 250, 242, .8);
+  --mux-hover: rgba(26, 51, 79, .05);
+  --mux-line: rgba(26, 51, 79, .12);
+  --mux-line-strong: rgba(26, 51, 79, .24);
+  --mux-accent: #2c527f;
+  --mux-accent-soft: rgba(44, 82, 127, .1);
+  --mux-accent-ink: #1a334f;
+  --mux-signal: #946a1e;
+  --mux-signal-soft: rgba(148, 106, 30, .12);
+  --mux-signal-line: rgba(148, 106, 30, .45);
+  --mux-signal-ink: #6e4e16;
+  --mux-muted: #5d5348;
+  --mux-ink: #1a2740;
+  --mux-grid: transparent;
+  --mux-ambient-1: #9bb8e0;
+  --mux-ambient-2: #e4c15a;
+  --mux-ambient-opacity: .2;
+  --mux-card: #fffdf8;
+  --mux-card-2: #f7f1e4;
+  --mux-card-border: rgba(26, 51, 79, .12);
+  --mux-card-glow: rgba(228, 193, 90, .16);
+  --mux-fallback-1: #f4efe6;
+  --mux-fallback-2: #4d7dba;
+  --mux-fallback-3: #1a334f;
+  --mux-shadow: 0 16px 40px rgba(40, 32, 16, .08);
+  --mux-modal: rgba(255, 252, 247, .98);
+  --mux-toast: rgba(255, 252, 247, .98);
+  --mux-pattern-opacity: .45;
+}
+
+html[data-aesthetic="loveme"] {
+  --mux-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mux-heading: Palatino, "Palatino Linotype", Georgia, serif;
+  --mux-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='46'%3E%3Ctext x='0' y='30' fill='%23ff2a2a' font-family='Georgia,serif' font-size='22'%3Elove me%3C/text%3E%3C/svg%3E");
+  --mux-pattern-opacity: .09;
+  --mux-grid: transparent;
+}
+html[data-aesthetic="loveme"][data-scheme="dark"] {
+  --mux-bg: #070000;
+  --mux-sidebar: rgba(12, 0, 0, .9);
+  --mux-topbar: rgba(12, 0, 0, .78);
+  --mux-surface: rgba(28, 4, 4, .88);
+  --mux-surface-2: rgba(12, 0, 0, .84);
+  --mux-inset: rgba(8, 0, 0, .55);
+  --mux-hover: rgba(255, 80, 80, .08);
+  --mux-line: rgba(255, 70, 70, .2);
+  --mux-line-strong: rgba(255, 70, 70, .4);
+  --mux-accent: #ff3b3b;
+  --mux-accent-soft: rgba(255, 45, 45, .16);
+  --mux-accent-ink: #ff8a8a;
+  --mux-signal: #ff5a38;
+  --mux-signal-soft: rgba(255, 90, 56, .16);
+  --mux-signal-line: rgba(255, 90, 56, .55);
+  --mux-signal-ink: #ffb199;
+  --mux-muted: #c98a8a;
+  --mux-ink: #fff1f1;
+  --mux-ambient-1: #ff2a2a;
+  --mux-ambient-2: #7a1010;
+  --mux-card: #1a0505;
+  --mux-card-2: #100202;
+  --mux-card-border: rgba(255, 70, 70, .24);
+  --mux-card-glow: rgba(255, 40, 40, .16);
+  --mux-fallback-1: #ff3b3b;
+  --mux-fallback-2: #7a1010;
+  --mux-fallback-3: #3d0505;
+  --mux-shadow: 0 18px 60px rgba(0, 0, 0, .45);
+  --mux-modal: rgba(16, 2, 2, .97);
+  --mux-toast: rgba(20, 3, 3, .96);
+}
+html[data-aesthetic="loveme"][data-scheme="light"] {
+  --mux-bg: #fff6f6;
+  --mux-sidebar: rgba(255, 248, 248, .9);
+  --mux-topbar: rgba(255, 248, 248, .84);
+  --mux-surface: rgba(255, 255, 255, .9);
+  --mux-surface-2: rgba(255, 241, 241, .92);
+  --mux-inset: rgba(255, 246, 246, .85);
+  --mux-hover: rgba(161, 12, 12, .05);
+  --mux-line: rgba(161, 12, 12, .14);
+  --mux-line-strong: rgba(161, 12, 12, .28);
+  --mux-accent: #c41212;
+  --mux-accent-soft: rgba(196, 18, 18, .1);
+  --mux-accent-ink: #a10c0c;
+  --mux-signal: #cc2c12;
+  --mux-signal-soft: rgba(204, 44, 18, .1);
+  --mux-signal-line: rgba(204, 44, 18, .4);
+  --mux-signal-ink: #a1220e;
+  --mux-muted: #7a4a4a;
+  --mux-ink: #2a1010;
+  --mux-ambient-1: #ff6d6d;
+  --mux-ambient-2: #ffb199;
+  --mux-ambient-opacity: .18;
+  --mux-card: #fffdfd;
+  --mux-card-2: #fff1f1;
+  --mux-card-border: rgba(161, 12, 12, .14);
+  --mux-card-glow: rgba(255, 59, 59, .08);
+  --mux-fallback-1: #ff6d6d;
+  --mux-fallback-2: #c41212;
+  --mux-fallback-3: #6e0909;
+  --mux-shadow: 0 16px 40px rgba(80, 10, 10, .08);
+  --mux-modal: rgba(255, 248, 248, .98);
+  --mux-toast: rgba(255, 248, 248, .98);
+}
+
+html[data-aesthetic="matrix"] {
+  --mux-font: ui-monospace, "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0, 0, 0, .28) 3px 4px);
+  --mux-grid: rgba(57, 255, 106, .035);
+}
+html[data-aesthetic="matrix"][data-scheme="dark"] {
+  --mux-bg: #010804;
+  --mux-sidebar: rgba(2, 12, 6, .9);
+  --mux-topbar: rgba(2, 12, 6, .78);
+  --mux-surface: rgba(6, 22, 12, .88);
+  --mux-surface-2: rgba(2, 10, 6, .84);
+  --mux-inset: rgba(1, 8, 4, .55);
+  --mux-hover: rgba(57, 255, 106, .06);
+  --mux-line: rgba(57, 255, 106, .16);
+  --mux-line-strong: rgba(57, 255, 106, .34);
+  --mux-accent: #1fe86a;
+  --mux-accent-soft: rgba(31, 232, 106, .12);
+  --mux-accent-ink: #7dffb0;
+  --mux-signal: #4dffe0;
+  --mux-signal-soft: rgba(77, 255, 224, .12);
+  --mux-signal-line: rgba(77, 255, 224, .5);
+  --mux-signal-ink: #8dffd4;
+  --mux-muted: #7dbe96;
+  --mux-ink: #d7ffe4;
+  --mux-ambient-1: #12c456;
+  --mux-ambient-2: #0c9a7c;
+  --mux-card: #07140e;
+  --mux-card-2: #040c08;
+  --mux-card-border: rgba(57, 255, 106, .2);
+  --mux-card-glow: rgba(31, 232, 106, .1);
+  --mux-fallback-1: #1fe86a;
+  --mux-fallback-2: #087534;
+  --mux-fallback-3: #032e15;
+  --mux-shadow: 0 18px 60px rgba(0, 0, 0, .45);
+  --mux-modal: rgba(3, 14, 8, .97);
+  --mux-toast: rgba(3, 14, 8, .96);
+  --mux-pattern-opacity: .45;
+}
+html[data-aesthetic="matrix"][data-scheme="light"] {
+  --mux-bg: #f3fff6;
+  --mux-sidebar: rgba(247, 255, 249, .92);
+  --mux-topbar: rgba(247, 255, 249, .86);
+  --mux-surface: rgba(255, 255, 255, .9);
+  --mux-surface-2: rgba(233, 255, 239, .92);
+  --mux-inset: rgba(243, 255, 246, .85);
+  --mux-hover: rgba(8, 117, 52, .06);
+  --mux-line: rgba(8, 117, 52, .16);
+  --mux-line-strong: rgba(8, 117, 52, .32);
+  --mux-accent: #087534;
+  --mux-accent-soft: rgba(8, 117, 52, .1);
+  --mux-accent-ink: #055226;
+  --mux-signal: #087560;
+  --mux-signal-soft: rgba(8, 117, 96, .1);
+  --mux-signal-line: rgba(8, 117, 96, .4);
+  --mux-signal-ink: #055244;
+  --mux-muted: #3d6b4e;
+  --mux-ink: #06210f;
+  --mux-grid: rgba(8, 117, 52, .05);
+  --mux-ambient-1: #8dffae;
+  --mux-ambient-2: #4dffe0;
+  --mux-ambient-opacity: .16;
+  --mux-card: #fbfffc;
+  --mux-card-2: #e9ffef;
+  --mux-card-border: rgba(8, 117, 52, .16);
+  --mux-card-glow: rgba(18, 196, 86, .08);
+  --mux-fallback-1: #12c456;
+  --mux-fallback-2: #087534;
+  --mux-fallback-3: #032e15;
+  --mux-shadow: 0 16px 40px rgba(4, 40, 16, .08);
+  --mux-modal: rgba(247, 255, 249, .98);
+  --mux-toast: rgba(247, 255, 249, .98);
+  --mux-pattern-opacity: .2;
+}
+
+html[data-aesthetic="tarot"] {
+  --mux-font: Palatino, "Palatino Linotype", "Iowan Old Style", Georgia, serif;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: none;
+  --mux-pattern-opacity: 0;
+  --mux-grid: transparent;
+}
+html[data-aesthetic="tarot"] .eyebrow { font-variant: small-caps; letter-spacing: .16em; }
+html[data-aesthetic="tarot"] .glass-panel { outline: 1px solid var(--mux-line); outline-offset: -7px; }
+html[data-aesthetic="tarot"][data-scheme="dark"] {
+  --mux-bg: #100818;
+  --mux-sidebar: rgba(16, 8, 24, .9);
+  --mux-topbar: rgba(16, 8, 24, .8);
+  --mux-surface: rgba(28, 14, 40, .9);
+  --mux-surface-2: rgba(16, 8, 24, .86);
+  --mux-inset: rgba(12, 6, 18, .6);
+  --mux-hover: rgba(243, 234, 216, .05);
+  --mux-line: rgba(230, 211, 161, .18);
+  --mux-line-strong: rgba(201, 164, 255, .36);
+  --mux-accent: #b98cff;
+  --mux-accent-soft: rgba(157, 99, 240, .16);
+  --mux-accent-ink: #d4b8ff;
+  --mux-signal: #e6d3a1;
+  --mux-signal-soft: rgba(230, 211, 161, .14);
+  --mux-signal-line: rgba(230, 211, 161, .5);
+  --mux-signal-ink: #f3ead8;
+  --mux-muted: #cbb6e8;
+  --mux-ink: #f3ead8;
+  --mux-ambient-1: #642eab;
+  --mux-ambient-2: #e6d3a1;
+  --mux-card: #1c0e26;
+  --mux-card-2: #140818;
+  --mux-card-border: rgba(230, 211, 161, .2);
+  --mux-card-glow: rgba(185, 140, 255, .14);
+  --mux-fallback-1: #f3ead8;
+  --mux-fallback-2: #7c3ed0;
+  --mux-fallback-3: #1e0e36;
+  --mux-shadow: 0 18px 60px rgba(0, 0, 0, .4);
+  --mux-modal: rgba(18, 8, 28, .97);
+  --mux-toast: rgba(18, 8, 28, .96);
+}
+html[data-aesthetic="tarot"][data-scheme="light"] {
+  --mux-bg: #f6f0e8;
+  --mux-sidebar: rgba(251, 246, 238, .92);
+  --mux-topbar: rgba(251, 246, 238, .86);
+  --mux-surface: rgba(255, 252, 247, .92);
+  --mux-surface-2: rgba(246, 240, 232, .94);
+  --mux-inset: rgba(251, 246, 238, .84);
+  --mux-hover: rgba(77, 36, 132, .05);
+  --mux-line: rgba(77, 36, 132, .14);
+  --mux-line-strong: rgba(77, 36, 132, .28);
+  --mux-accent: #642eab;
+  --mux-accent-soft: rgba(100, 46, 171, .1);
+  --mux-accent-ink: #4d2484;
+  --mux-signal: #7d5c22;
+  --mux-signal-soft: rgba(125, 92, 34, .1);
+  --mux-signal-line: rgba(125, 92, 34, .42);
+  --mux-signal-ink: #5c4318;
+  --mux-muted: #65586a;
+  --mux-ink: #241428;
+  --mux-ambient-1: #d4b8ff;
+  --mux-ambient-2: #e6d3a1;
+  --mux-ambient-opacity: .18;
+  --mux-card: #fffdf8;
+  --mux-card-2: #f6f0e8;
+  --mux-card-border: rgba(77, 36, 132, .14);
+  --mux-card-glow: rgba(124, 62, 208, .08);
+  --mux-fallback-1: #f3ead8;
+  --mux-fallback-2: #7c3ed0;
+  --mux-fallback-3: #35185c;
+  --mux-shadow: 0 16px 40px rgba(36, 20, 40, .08);
+  --mux-modal: rgba(255, 252, 247, .98);
+  --mux-toast: rgba(255, 252, 247, .98);
+}
+
+html[data-aesthetic="hearteyes"] {
+  --mux-font: ui-rounded, "Segoe UI", Inter, ui-sans-serif, system-ui, sans-serif;
+  --mux-heading: var(--mux-font);
+  --mux-pattern: radial-gradient(circle, var(--mux-accent) 1.1px, transparent 1.3px) 0 0 / 9px 9px;
+  --mux-grid: transparent;
+}
+html[data-aesthetic="hearteyes"][data-scheme="dark"] {
+  --mux-bg: #1a0b12;
+  --mux-sidebar: rgba(26, 11, 18, .88);
+  --mux-topbar: rgba(26, 11, 18, .76);
+  --mux-surface: rgba(42, 16, 30, .86);
+  --mux-surface-2: rgba(26, 11, 18, .82);
+  --mux-inset: rgba(18, 6, 12, .55);
+  --mux-hover: rgba(255, 79, 154, .08);
+  --mux-line: rgba(255, 125, 186, .2);
+  --mux-line-strong: rgba(255, 125, 186, .38);
+  --mux-accent: #ff7dba;
+  --mux-accent-soft: rgba(255, 79, 154, .16);
+  --mux-accent-ink: #ffadd4;
+  --mux-signal: #ff4fa8;
+  --mux-signal-soft: rgba(255, 79, 168, .16);
+  --mux-signal-line: rgba(255, 79, 168, .5);
+  --mux-signal-ink: #ffc2de;
+  --mux-muted: #e0a8c4;
+  --mux-ink: #ffe8f3;
+  --mux-ambient-1: #ff4f9a;
+  --mux-ambient-2: #ff7dba;
+  --mux-card: #2a1020;
+  --mux-card-2: #1a0b12;
+  --mux-card-border: rgba(255, 125, 186, .24);
+  --mux-card-glow: rgba(255, 79, 154, .14);
+  --mux-fallback-1: #ff7dba;
+  --mux-fallback-2: #d1126c;
+  --mux-fallback-3: #6e0a3a;
+  --mux-shadow: 0 18px 60px rgba(0, 0, 0, .4);
+  --mux-modal: rgba(28, 10, 18, .97);
+  --mux-toast: rgba(28, 10, 18, .96);
+  --mux-pattern-opacity: .18;
+}
+html[data-aesthetic="hearteyes"][data-scheme="light"] {
+  --mux-bg: #fff7fb;
+  --mux-sidebar: rgba(255, 247, 251, .78);
+  --mux-topbar: rgba(255, 247, 251, .74);
+  --mux-surface: rgba(255, 255, 255, .72);
+  --mux-surface-2: rgba(255, 240, 247, .78);
+  --mux-inset: rgba(255, 247, 251, .7);
+  --mux-hover: rgba(242, 39, 132, .06);
+  --mux-line: rgba(242, 39, 132, .16);
+  --mux-line-strong: rgba(242, 39, 132, .32);
+  --mux-accent: #f22784;
+  --mux-accent-soft: rgba(242, 39, 132, .1);
+  --mux-accent-ink: #d1126c;
+  --mux-signal: #c21d78;
+  --mux-signal-soft: rgba(194, 29, 120, .1);
+  --mux-signal-line: rgba(194, 29, 120, .4);
+  --mux-signal-ink: #a30e55;
+  --mux-muted: #8a4d68;
+  --mux-ink: #3a2030;
+  --mux-ambient-1: #ff7dba;
+  --mux-ambient-2: #ffd6ea;
+  --mux-ambient-opacity: .22;
+  --mux-card: rgba(255, 255, 255, .82);
+  --mux-card-2: rgba(255, 240, 247, .9);
+  --mux-card-border: rgba(242, 39, 132, .18);
+  --mux-card-glow: rgba(255, 79, 154, .1);
+  --mux-fallback-1: #ff7dba;
+  --mux-fallback-2: #f22784;
+  --mux-fallback-3: #a30e55;
+  --mux-shadow: 0 16px 40px rgba(120, 20, 60, .08);
+  --mux-modal: rgba(255, 247, 251, .98);
+  --mux-toast: rgba(255, 247, 251, .98);
+  --mux-pattern-opacity: .28;
+}
+
+html[data-aesthetic="matrix"] .glass-panel,
+html[data-aesthetic="matrix"] .nav-item,
+html[data-aesthetic="matrix"] .now-live,
+html[data-aesthetic="matrix"] .activity-card,
+html[data-aesthetic="matrix"] .look-trigger { border-radius: 2px; }
+html[data-aesthetic="hearteyes"] .glass-panel,
+html[data-aesthetic="hearteyes"] .nav-item,
+html[data-aesthetic="hearteyes"] .activity-card { border-radius: 28px; }
+html[data-aesthetic="tarot"] .glass-panel,
+html[data-aesthetic="tarot"] .activity-card { border-radius: 4px; }
+html[data-aesthetic="loveme"] .hero-header h1 { letter-spacing: -.03em; }

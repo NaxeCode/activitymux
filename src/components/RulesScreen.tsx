@@ -65,11 +65,11 @@ export function RulesScreen({ config, liveRuleId, livePresetLabel, onChange }: R
     <div className="screen">
       <header className="screen-header hero-header">
         <Box>
-          <Badge variant="light" color="ultraviolet" size="sm" mb="sm">RULES</Badge>
+          <Badge variant="light" color="accent" size="sm" mb="sm">RULES</Badge>
           <Title order={1}>Process rules</Title>
           <Text c="dimmed" mt="xs">Publish a preset while matching programs are running. A higher priority number wins. A pin overrides every rule.</Text>
         </Box>
-        <HelpTip label="Pick a running program. The rule stores its process name, not the file path."><Button variant="gradient" gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }} leftSection={<Plus size={16} />} disabled={config.presets.length === 0} onClick={() => setPickerTarget(NEW_RULE)}>Add rule</Button></HelpTip>
+        <HelpTip label="Pick a running program. The rule stores its process name, not the file path."><Button variant="gradient" gradient={{ from: "accent.5", to: "accent.7" }} leftSection={<Plus size={16} />} disabled={config.presets.length === 0} onClick={() => setPickerTarget(NEW_RULE)}>Add rule</Button></HelpTip>
       </header>
 
       <Stack className="rule-stack" gap="md">
@@ -77,21 +77,21 @@ export function RulesScreen({ config, liveRuleId, livePresetLabel, onChange }: R
           <Paper className={`glass-panel rule-card${rule.enabled ? "" : " is-disabled"}${rule.id === liveRuleId ? " is-live" : ""}`} radius="xl" p="lg" key={rule.id}>
             <Group justify="space-between" align="flex-start" mb="md">
               <Group gap="md" align="center">
-                <ThemeIcon variant={rule.enabled ? "gradient" : "light"} gradient={{ from: "ultraviolet.4", to: "signal.5" }} color="gray" size="lg" radius="md">
+                <ThemeIcon variant={rule.enabled ? "gradient" : "light"} gradient={{ from: "accent.4", to: "signal.5" }} color="gray" size="lg" radius="md">
                   <Route size={18} />
                 </ThemeIcon>
                 <Box>
                   <Group gap="xs">
                     <Text className="eyebrow" c="dimmed">RULE {String(index + 1).padStart(2, "0")}</Text>
-                    {rule.id === liveRuleId && <Badge size="xs" variant="filled" color="teal">Live</Badge>}
-                    <Badge size="xs" variant="light" color={rule.enabled ? "teal" : "gray"}>{rule.enabled ? "Enabled" : "Paused"}</Badge>
+                    {rule.id === liveRuleId && <Badge size="xs" variant="filled" color="signal">Live</Badge>}
+                    <Badge size="xs" variant="light" color={rule.enabled ? "signal" : "gray"}>{rule.enabled ? "Enabled" : "Paused"}</Badge>
                   </Group>
                   <Text fw={700} mt={2}>{rule.label}</Text>
-                  {rule.id === liveRuleId && <Text c="teal.3" size="xs">This rule is choosing {livePresetLabel ?? "the current preset"}.</Text>}
+                  {rule.id === liveRuleId && <Text className="tone-signal" size="xs">This rule is choosing {livePresetLabel ?? "the current preset"}.</Text>}
                 </Box>
               </Group>
               <Group gap="sm">
-                <HelpTip label={rule.enabled ? "Pause this rule. It stays in the list but cannot win until you turn it back on." : "Let this rule compete again. Save before Discord uses it."}><Switch checked={rule.enabled} onChange={(event) => updateRule(rule.id, { enabled: event.currentTarget.checked })} color="teal" aria-label={rule.enabled ? "Disable rule" : "Enable rule"} /></HelpTip>
+                <HelpTip label={rule.enabled ? "Pause this rule. It stays in the list but cannot win until you turn it back on." : "Let this rule compete again. Save before Discord uses it."}><Switch checked={rule.enabled} onChange={(event) => updateRule(rule.id, { enabled: event.currentTarget.checked })} color="signal" aria-label={rule.enabled ? "Disable rule" : "Enable rule"} /></HelpTip>
                 <HelpTip label="Delete this rule. It stays until you save."><ActionIcon color="red" variant="light" onClick={() => onChange({ ...config, rules: config.rules.filter((candidate) => candidate.id !== rule.id) })} aria-label="Delete rule"><Trash2 size={15} /></ActionIcon></HelpTip>
               </Group>
             </Group>
@@ -113,7 +113,7 @@ export function RulesScreen({ config, liveRuleId, livePresetLabel, onChange }: R
                   onChange={(value) => value && updateRule(rule.id, { matchMode: value as ProcessRule["matchMode"] })}
                 />
                 <Text c="dimmed" size="sm">publish</Text>
-                <Badge color="ultraviolet" variant="light">{config.presets.find((preset) => preset.id === rule.presetId)?.label ?? "Missing preset"}</Badge>
+                <Badge color="accent" variant="light">{config.presets.find((preset) => preset.id === rule.presetId)?.label ?? "Missing preset"}</Badge>
               </Group>
               <Text c="dimmed" size="xs" mt="xs">{rule.matchMode === "any" ? "One listed process name is enough. Matching ignores case and a trailing .exe." : "Every listed process must be running. Matching ignores case and a trailing .exe."}</Text>
             </Paper>
@@ -131,10 +131,10 @@ export function RulesScreen({ config, liveRuleId, livePresetLabel, onChange }: R
 
         {config.rules.length === 0 && (
           <Paper className="glass-panel empty-state" radius="xl" p={48}>
-            <ThemeIcon variant="light" color="ultraviolet" size={54} radius="xl" mx="auto"><Power size={24} /></ThemeIcon>
+            <ThemeIcon variant="light" color="accent" size={54} radius="xl" mx="auto"><Power size={24} /></ThemeIcon>
             <Title order={2} mt="md">No rules</Title>
             <Text c="dimmed" mt="xs" mb="lg">A rule watches process names and publishes a preset while they run. Create a preset first.</Text>
-            <Button variant="light" color="ultraviolet" leftSection={<Plus size={16} />} disabled={config.presets.length === 0} onClick={() => setPickerTarget(NEW_RULE)}>Add rule</Button>
+            <Button variant="light" color="accent" leftSection={<Plus size={16} />} disabled={config.presets.length === 0} onClick={() => setPickerTarget(NEW_RULE)}>Add rule</Button>
           </Paper>
         )}
       </Stack>

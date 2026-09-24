@@ -125,11 +125,11 @@ export function PresetsScreen({ config, livePresetId, published, onChange, onRes
     <div className="screen">
       <header className="screen-header hero-header">
         <Box>
-          <Badge variant="light" color="ultraviolet" size="sm" mb="sm">PRESETS</Badge>
+          <Badge variant="light" color="accent" size="sm" mb="sm">PRESETS</Badge>
           <Title order={1}>Presets</Title>
           <Text c="dimmed" mt="xs">A preset is one activity. Discord takes the title from the application ID, not from the name in this list.</Text>
         </Box>
-        <Button variant="gradient" gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }} leftSection={<Plus size={16} />} onClick={addPreset}>Add preset</Button>
+        <Button variant="gradient" gradient={{ from: "accent.5", to: "accent.7" }} leftSection={<Plus size={16} />} onClick={addPreset}>Add preset</Button>
       </header>
 
       <div className="preset-workbench">
@@ -146,12 +146,12 @@ export function PresetsScreen({ config, livePresetId, published, onChange, onRes
                   className={`preset-list__item${preset.id === selectedId ? " is-selected" : ""}${preset.id === livePresetId ? " is-live" : ""}`}
                   onClick={() => setSelectedId(preset.id)}
                 >
-                  <ThemeIcon className="preset-avatar" variant={preset.id === livePresetId ? "filled" : preset.id === selectedId ? "gradient" : "light"} color={preset.id === livePresetId ? "teal" : "gray"} gradient={{ from: "ultraviolet.4", to: "signal.5" }} size={38} radius="md">
+                  <ThemeIcon className="preset-avatar" variant={preset.id === livePresetId ? "filled" : preset.id === selectedId ? "gradient" : "light"} color={preset.id === livePresetId ? "signal" : "gray"} gradient={{ from: "accent.4", to: "signal.5" }} size={38} radius="md">
                     {String(index + 1).padStart(2, "0")}
                   </ThemeIcon>
                   <Box className="preset-list__copy">
                     <Text fw={650} size="sm" truncate>{preset.label}</Text>
-                    <Text c={preset.id === livePresetId ? "teal.3" : "dimmed"} size="xs" truncate>{preset.id === livePresetId ? (published ? "Live on Discord" : "Selected") : preset.activity.name}</Text>
+                    <Text className={preset.id === livePresetId ? "tone-signal" : undefined} c={preset.id === livePresetId ? undefined : "dimmed"} size="xs" truncate>{preset.id === livePresetId ? (published ? "Live on Discord" : "Selected") : preset.activity.name}</Text>
                   </Box>
                 </UnstyledButton>
               ))}
@@ -166,7 +166,7 @@ export function PresetsScreen({ config, livePresetId, published, onChange, onRes
               <Box>
                 <Group gap="xs">
                   <Text className="eyebrow" c="dimmed">SELECTED</Text>
-                  {selected.id === livePresetId && <Badge color="teal" variant="light" size="xs">{published ? "Live on Discord" : "Selected"}</Badge>}
+                  {selected.id === livePresetId && <Badge color="signal" variant="light" size="xs">{published ? "Live on Discord" : "Selected"}</Badge>}
                 </Group>
                 <Title order={2}>{selected.label}</Title>
                 {selected.id !== livePresetId && <Text c="dimmed" size="xs" mt={4}>{livePresetId ? "This is not the preset Discord is using." : "Discord is not using a preset."}</Text>}

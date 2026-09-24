@@ -73,7 +73,7 @@ export function ProcessPicker({ open, onClose, onSelect }: ProcessPickerProps) {
                 onClick={() => { onSelect(process.name); onClose(); }}
               >
                 <Group wrap="nowrap">
-                  <Avatar color="ultraviolet" variant="light" radius="md">{process.name.slice(0, 1).toUpperCase()}</Avatar>
+                  <Avatar color="accent" variant="light" radius="md">{process.name.slice(0, 1).toUpperCase()}</Avatar>
                   <Box className="process-result__copy">
                     <Text fw={650} size="sm">{process.name}</Text>
                     <Text c="dimmed" size="xs" truncate>{process.executable || `PID ${process.pid}`}</Text>

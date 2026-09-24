@@ -71,7 +71,7 @@ export function ActivityCard({ preset, compact = false }: ActivityCardProps) {
         </Box>
         <Stack className="activity-card__copy" gap={2}>
           <Text fw={750} size={compact ? "sm" : "md"} lineClamp={1}>{activity.details || preset.label}</Text>
-          {activity.state && <Text c="gray.4" size="sm" lineClamp={1}>{activity.state}</Text>}
+          {activity.state && <Text c="dimmed" size="sm" lineClamp={1}>{activity.state}</Text>}
           {elapsed && <Group gap={5} mt={2}><Clock3 size={13} /><Text c="dimmed" size="xs">{elapsed}</Text></Group>}
         </Stack>
       </Group>

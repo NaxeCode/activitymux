@@ -1,14 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import App from "./App";
-import { activityMuxTheme } from "./theme";
+import { AppearanceProvider } from "./AppearanceProvider";
+import { applyAppearance, readAppearance } from "./appearance";
+import "./aesthetics.css";
+import "./App.css";
+
+applyAppearance(readAppearance());
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider theme={activityMuxTheme} defaultColorScheme="dark">
+    <AppearanceProvider>
       <App />
-    </MantineProvider>
+    </AppearanceProvider>
   </React.StrictMode>,
 );

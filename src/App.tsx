@@ -38,6 +38,7 @@ import { DEMO_CONFIG, DEMO_SNAPSHOT } from "./demo";
 import type { AppConfig, Screen, ServiceSnapshot } from "./types";
 import { findUpdate, installUpdate, type UpdateOffer } from "./updates";
 import { HelpTip } from "./components/HelpTip";
+import { AppearanceMenu } from "./components/AppearanceControls";
 import { connectionHelp, livePresence } from "./explain";
 import "./App.css";
 
@@ -60,7 +61,7 @@ const navigation: Array<{ id: Screen; label: string; description: string; icon: 
 const connectionCopy = {
   setupRequired: { label: "Setup required", color: "yellow" },
   connecting: { label: "Connecting", color: "blue" },
-  connected: { label: "Discord online", color: "teal" },
+  connected: { label: "Discord online", color: "signal" },
   disconnected: { label: "Discord offline", color: "red" },
 } as const;
 
@@ -72,7 +73,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
-  const [appVersion, setAppVersion] = useState("0.2.1");
+  const [appVersion, setAppVersion] = useState("0.2.2");
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [installingUpdate, setInstallingUpdate] = useState(false);
   const [updateProgress, setUpdateProgress] = useState<string | null>(null);
@@ -166,7 +167,7 @@ export default function App() {
     return (
       <Center className="loading-screen">
         <Stack align="center" gap="md">
-          <div className="loading-orbit"><Loader color="ultraviolet.4" size="sm" /></div>
+          <div className="loading-orbit"><Loader color="accent" size="sm" /></div>
           <Text c="dimmed" size="sm">Starting ActivityMux…</Text>
         </Stack>
       </Center>
@@ -261,7 +262,7 @@ export default function App() {
     >
       <AppShell.Navbar className="sidebar" p="md">
         <Group className="brand" gap="sm" wrap="nowrap">
-          <ThemeIcon className="brand__mark" size={42} radius="md" variant="gradient" gradient={{ from: "ultraviolet.4", to: "signal.5", deg: 135 }}>
+          <ThemeIcon className="brand__mark" size={42} radius="md" variant="gradient" gradient={{ from: "accent.4", to: "signal.5", deg: 135 }}>
             <Activity size={22} />
           </ThemeIcon>
           <Box>
@@ -270,7 +271,7 @@ export default function App() {
           </Box>
         </Group>
 
-        <Divider my="lg" color="dark.5" />
+        <Divider my="lg" />
         <Text className="nav-section-label" c="dimmed" size="10px" fw={700} mb="xs">MENU</Text>
         <Stack gap={6}>
           {navigation.map((item) => {
@@ -284,7 +285,7 @@ export default function App() {
                 leftSection={<Icon size={18} strokeWidth={1.8} />}
                 onClick={() => setScreen(item.id)}
                 variant="light"
-                color="ultraviolet"
+                color="accent"
                 className="nav-item"
               />
             );
@@ -314,7 +315,7 @@ export default function App() {
       <AppShell.Header className="topbar" px="xl">
         <Group h="100%" justify="space-between" wrap="nowrap">
           <Group gap="sm">
-            <ThemeIcon variant="light" color="ultraviolet" size="md" radius="md">
+            <ThemeIcon variant="light" color="accent" size="md" radius="md">
               <activeNavigation.icon size={16} />
             </ThemeIcon>
             <Box>
@@ -329,21 +330,22 @@ export default function App() {
                 <span className="now-live__kicker">{liveKicker}</span>
                 <strong>{liveLabel}</strong>
               </span>
-              <Badge size="xs" variant="light" color={liveOnDiscord ? "teal" : "gray"}>{live.source}</Badge>
+              <Badge size="xs" variant="light" color={liveOnDiscord ? "signal" : "gray"}>{live.source}</Badge>
             </UnstyledButton>
           </HelpTip>
           <Group gap="md">
+            <AppearanceMenu />
             <HelpTip label={dirty ? "Discord is still using the last save. Save to publish these edits." : "Discord is using this saved setup."}>
-              <Group gap={7} className="save-state">
+              <Group gap={7} className={dirty ? "save-state save-state--dirty" : "save-state"}>
                 <span className={dirty ? "save-dot save-dot--dirty" : "save-dot"} />
-                <Text c={dirty ? "yellow.3" : "dimmed"} size="xs">{dirty ? "Unsaved changes" : "Synced locally"}</Text>
+                <Text c={dirty ? undefined : "dimmed"} size="xs">{dirty ? "Unsaved changes" : "Synced locally"}</Text>
               </Group>
             </HelpTip>
             <HelpTip label={dirty ? "Write the edits and send the chosen presence to Discord." : "Nothing new to send."}>
               <Button
                 size="sm"
                 variant={dirty ? "gradient" : "subtle"}
-                gradient={{ from: "ultraviolet.5", to: "ultraviolet.7", deg: 135 }}
+                gradient={{ from: "accent.5", to: "accent.7", deg: 135 }}
                 leftSection={dirty ? <Save size={15} /> : <Check size={15} />}
                 disabled={!dirty}
                 loading={saving}
@@ -405,14 +407,14 @@ export default function App() {
           {updateProgress && <Text size="sm">{updateProgress}</Text>}
           <Group justify="flex-end">
             <Button variant="subtle" color="gray" disabled={installingUpdate} onClick={dismissUpdate}>Not now</Button>
-            <Button variant="gradient" gradient={{ from: "ultraviolet.5", to: "ultraviolet.7" }} loading={installingUpdate} onClick={() => void startUpdate()}>Install and restart</Button>
+            <Button variant="gradient" gradient={{ from: "accent.5", to: "accent.7" }} loading={installingUpdate} onClick={() => void startUpdate()}>Install and restart</Button>
           </Group>
         </Stack>
       </Modal>
       {message && (
         <Notification
           className="app-notification"
-          color={message.kind === "success" ? "teal" : "red"}
+          color={message.kind === "success" ? "signal" : "red"}
           icon={message.kind === "success" ? <Check size={16} /> : <AlertCircle size={16} />}
           title={message.kind === "success" ? "Saved" : "Error"}
           withCloseButton={false}
