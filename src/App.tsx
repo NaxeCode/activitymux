@@ -39,6 +39,8 @@ import type { AppConfig, Screen, ServiceSnapshot } from "./types";
 import { findUpdate, installUpdate, type UpdateOffer } from "./updates";
 import { HelpTip } from "./components/HelpTip";
 import { AppearanceMenu } from "./components/AppearanceControls";
+import { useAppearance } from "./AppearanceProvider";
+import { WindowControls, startWindowDrag, toggleWindowMaximized } from "./components/WindowControls";
 import { connectionHelp, livePresence } from "./explain";
 import "./App.css";
 
@@ -66,6 +68,7 @@ const connectionCopy = {
 } as const;
 
 export default function App() {
+  const { appearance } = useAppearance();
   const [screen, setScreen] = useState<Screen>("dashboard");
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [savedConfig, setSavedConfig] = useState<AppConfig | null>(null);
@@ -73,7 +76,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
-  const [appVersion, setAppVersion] = useState("0.2.2");
+  const [appVersion, setAppVersion] = useState("0.2.3");
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [installingUpdate, setInstallingUpdate] = useState(false);
   const [updateProgress, setUpdateProgress] = useState<string | null>(null);
@@ -271,8 +274,7 @@ export default function App() {
           </Box>
         </Group>
 
-        <Divider my="lg" />
-        <Text className="nav-section-label" c="dimmed" size="10px" fw={700} mb="xs">MENU</Text>
+        <Divider my="sm" />
         <Stack gap={6}>
           {navigation.map((item) => {
             const Icon = item.icon;
@@ -291,6 +293,7 @@ export default function App() {
             );
           })}
         </Stack>
+        {appearance.aesthetic === "hearteyes" && <div className="heart-eyes-art" aria-hidden="true" />}
 
         <Box mt="auto" className="sidebar__footer">
           <HelpTip label={liveOnDiscord ? `${liveLabel} is on Discord now. ${live.source}.` : `${liveLabel} is selected. ${connectionHelp[snapshot.connection]}`}>
@@ -312,27 +315,25 @@ export default function App() {
         </Box>
       </AppShell.Navbar>
 
-      <AppShell.Header className="topbar" px="xl">
-        <Group h="100%" justify="space-between" wrap="nowrap">
-          <Group gap="sm">
+      <AppShell.Header className="topbar">
+        <div className="topbar__body" onMouseDown={startWindowDrag} onDoubleClick={toggleWindowMaximized}>
+          <Group className="topbar__main" h="100%" justify="space-between" wrap="nowrap">
+          <Group gap="md" wrap="nowrap">
             <ThemeIcon variant="light" color="accent" size="md" radius="md">
               <activeNavigation.icon size={16} />
             </ThemeIcon>
-            <Box>
-              <Text fw={700} size="sm">{activeNavigation.label}</Text>
-              <Text c="dimmed" size="xs">{activeNavigation.description}</Text>
-            </Box>
+            <Text fw={700} size="sm">{activeNavigation.label}</Text>
+            <HelpTip label={liveOnDiscord ? `${liveLabel} is on Discord now. ${live.source}.` : `${liveLabel} is selected, but Discord is not showing it yet. ${live.source}.`}>
+              <UnstyledButton className={`now-live${liveOnDiscord ? "" : " is-empty"}`} type="button" onClick={() => setScreen("dashboard")}>
+                <span className={`status-beacon status-beacon--${snapshot.connection}`} />
+                <span className="now-live__copy">
+                  <span className="now-live__kicker">{liveKicker}</span>
+                  <strong>{liveLabel}</strong>
+                </span>
+                <Badge size="xs" variant="light" color={liveOnDiscord ? "signal" : "gray"}>{live.source}</Badge>
+              </UnstyledButton>
+            </HelpTip>
           </Group>
-          <HelpTip label={liveOnDiscord ? `${liveLabel} is on Discord now. ${live.source}.` : `${liveLabel} is selected, but Discord is not showing it yet. ${live.source}.`}>
-            <UnstyledButton className={`now-live${liveOnDiscord ? "" : " is-empty"}`} type="button" onClick={() => setScreen("dashboard")}>
-              <span className={`status-beacon status-beacon--${snapshot.connection}`} />
-              <span className="now-live__copy">
-                <span className="now-live__kicker">{liveKicker}</span>
-                <strong>{liveLabel}</strong>
-              </span>
-              <Badge size="xs" variant="light" color={liveOnDiscord ? "signal" : "gray"}>{live.source}</Badge>
-            </UnstyledButton>
-          </HelpTip>
           <Group gap="md">
             <AppearanceMenu />
             <HelpTip label={dirty ? "Discord is still using the last save. Save to publish these edits." : "Discord is using this saved setup."}>
@@ -355,7 +356,9 @@ export default function App() {
               </Button>
             </HelpTip>
           </Group>
-        </Group>
+          </Group>
+        </div>
+        <WindowControls />
       </AppShell.Header>
 
       <AppShell.Main className="workspace">

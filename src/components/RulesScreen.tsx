@@ -63,14 +63,10 @@ export function RulesScreen({ config, liveRuleId, livePresetLabel, onChange }: R
 
   return (
     <div className="screen">
-      <header className="screen-header hero-header">
-        <Box>
-          <Badge variant="light" color="accent" size="sm" mb="sm">RULES</Badge>
-          <Title order={1}>Process rules</Title>
-          <Text c="dimmed" mt="xs">Publish a preset while matching programs are running. A higher priority number wins. A pin overrides every rule.</Text>
-        </Box>
+      <Group className="screen-toolbar" justify="space-between" align="center" wrap="nowrap" mb="md">
+        <Text c="dimmed" size="sm">A higher priority number wins. A pin overrides every rule.</Text>
         <HelpTip label="Pick a running program. The rule stores its process name, not the file path."><Button variant="gradient" gradient={{ from: "accent.5", to: "accent.7" }} leftSection={<Plus size={16} />} disabled={config.presets.length === 0} onClick={() => setPickerTarget(NEW_RULE)}>Add rule</Button></HelpTip>
-      </header>
+      </Group>
 
       <Stack className="rule-stack" gap="md">
         {sortedRules.map((rule, index) => (

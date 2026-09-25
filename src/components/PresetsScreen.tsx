@@ -123,14 +123,10 @@ export function PresetsScreen({ config, livePresetId, published, onChange, onRes
 
   return (
     <div className="screen">
-      <header className="screen-header hero-header">
-        <Box>
-          <Badge variant="light" color="accent" size="sm" mb="sm">PRESETS</Badge>
-          <Title order={1}>Presets</Title>
-          <Text c="dimmed" mt="xs">A preset is one activity. Discord takes the title from the application ID, not from the name in this list.</Text>
-        </Box>
+      <Group className="screen-toolbar" justify="space-between" align="center" wrap="nowrap" mb="md">
+        <Text c="dimmed" size="sm">Discord takes the title from the application ID, not from the name in this list.</Text>
         <Button variant="gradient" gradient={{ from: "accent.5", to: "accent.7" }} leftSection={<Plus size={16} />} onClick={addPreset}>Add preset</Button>
-      </header>
+      </Group>
 
       <div className="preset-workbench">
         <Paper className="glass-panel preset-list" radius="xl" p="sm">

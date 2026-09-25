@@ -73,25 +73,6 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
 
   return (
     <div className="screen dashboard">
-      <header className="screen-header hero-header">
-        <Box>
-          <Badge variant="light" color={snapshot.connection === "connected" && resolvedPreset ? "signal" : "gray"} size="sm" mb="sm">{snapshot.connection === "connected" && resolvedPreset ? "NOW LIVE" : resolvedPreset ? "SELECTED" : "NO ACTIVITY"}</Badge>
-          <Title order={1}>{resolvedPreset?.label ?? "No activity"}</Title>
-          <Text c="dimmed" mt="xs">{reasonText(snapshot)}</Text>
-        </Box>
-        <HelpTip label={connectionHelp[snapshot.connection]}>
-          <Badge
-            className="connection-pill"
-            color={connection.color}
-            variant="light"
-            size="lg"
-            radius="xl"
-            leftSection={<Radio size={14} />}
-          >
-            {connection.label}
-          </Badge>
-        </HelpTip>
-      </header>
 
       {snapshot.connection === "setupRequired" && (
         <Alert
@@ -110,13 +91,15 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
       )}
 
       <SimpleGrid className="dashboard-grid" cols={{ base: 1, lg: 2 }} spacing="lg">
-        <Paper className="glass-panel live-panel" p="xl" radius="xl">
-          <Group justify="space-between" mb="lg">
+        <Paper className="glass-panel live-panel" p="lg" radius="xl">
+          <Group justify="space-between" mb="md" wrap="nowrap">
             <Box>
               <Text className="eyebrow tone-signal">DISCORD IS USING</Text>
-              <Title order={2} mt={4}>{resolvedPreset?.label ?? "Nothing selected"}</Title>
+              <Title order={3} mt={2}>{resolvedPreset?.label ?? "Nothing selected"}</Title>
             </Box>
-            {isPinned && <HelpTip label="A pin ignores process rules and the default until you release it."><Badge variant="gradient" gradient={{ from: "accent.5", to: "signal.5" }} leftSection={<Pin size={12} />}>Pinned</Badge></HelpTip>}
+            <HelpTip label={connectionHelp[snapshot.connection]}>
+              <Badge className="connection-pill" color={connection.color} variant="light" size="sm" radius="xl" leftSection={<Radio size={12} />}>{connection.label}</Badge>
+            </HelpTip>
           </Group>
 
           <ActivityCard preset={resolvedPreset} />
@@ -141,7 +124,7 @@ export function Dashboard({ config, snapshot, onManualOverride, onNavigateSettin
         </Paper>
 
         <Stack gap="lg">
-          <Paper className="glass-panel override-panel" p="xl" radius="xl">
+          <Paper className="glass-panel override-panel" p="lg" radius="xl">
             <Group gap="sm" mb="xs">
               <ThemeIcon variant="light" color="accent" radius="md"><Pin size={17} /></ThemeIcon>
               <Box>

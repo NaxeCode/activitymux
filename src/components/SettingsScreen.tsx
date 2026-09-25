@@ -2,7 +2,6 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   Alert,
-  Badge,
   Box,
   Button,
   Group,
@@ -45,13 +44,6 @@ export function SettingsScreen({ config, checkingUpdates, onChange, onImport, on
 
   return (
     <div className="screen settings-screen">
-      <header className="screen-header hero-header">
-        <Box>
-          <Badge variant="light" color="accent" size="sm" mb="sm">SETTINGS</Badge>
-          <Title order={1}>Settings</Title>
-          <Text c="dimmed" mt="xs">The application ID is required. Discord uses that application's name as the title.</Text>
-        </Box>
-      </header>
 
       <SimpleGrid className="settings-grid" cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper className="glass-panel look-section" radius="xl" p="xl">
