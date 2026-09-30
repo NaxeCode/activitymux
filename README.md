@@ -1,3 +1,5 @@
+<img src=".github/brand/logo.svg" width="80" alt="" />
+
 # ActivityMux
 
 A desktop app for Windows and Linux that sets one Discord Rich Presence from presets, process rules, or a manual pin.
