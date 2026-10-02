@@ -77,6 +77,14 @@ Publish by tagging `vX.Y.Z` after that same version is set in `package.json`, `s
 
 Released and in use, currently v0.2.x. Windows installers are not code-signed yet.
 
+## How this project is run
+
+[![tracked in Linear](.github/brand/badges/run-linear.svg)](https://linear.app) [![AI-reviewed · Codex](.github/brand/badges/run-codex.svg)](#how-this-project-is-run) [![PR-only main](.github/brand/badges/run-main.svg)](#how-this-project-is-run)
+
+- **Planning:** tracked in Linear as initiatives → projects → milestones → issues; branch names and PR titles carry the issue ID.
+- **Review:** every pull request gets a Codex review before merge.
+- **Guardrails:** the default branch changes only through pull requests (GitHub ruleset).
+
 ## License
 
 MIT
