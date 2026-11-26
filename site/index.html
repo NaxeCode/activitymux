@@ -17,6 +17,7 @@
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
     <title>ActivityMux — one Discord presence, routed</title>
+    <script defer src="/analytics/portfolio.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -43,7 +44,7 @@
           <h1>One presence.<br />It follows what you run.</h1>
           <p class="lede">ActivityMux publishes one custom Discord activity and switches it for you: a manual pin, the program you have open, or a fallback.</p>
           <div class="hero-actions">
-            <a class="button button-primary" id="primary-download" href="https://github.com/NaxeCode/activitymux/releases/latest">Download</a>
+            <a class="button button-primary" id="primary-download" data-demo-action="open_release" href="https://github.com/NaxeCode/activitymux/releases/latest">Download</a>
             <a class="button button-secondary" href="#how">See the order</a>
           </div>
           <p class="hero-meta">
@@ -183,17 +184,17 @@
             <article>
               <h3>Windows</h3>
               <p>Current-user installer. Unsigned, so SmartScreen may warn. This build can update itself.</p>
-              <a class="button button-primary" data-asset="exe" href="https://github.com/NaxeCode/activitymux/releases/latest">Download .exe <span data-size></span></a>
+              <a class="button button-primary" data-asset="exe" data-demo-action="open_release" href="https://github.com/NaxeCode/activitymux/releases/latest">Download .exe <span data-size></span></a>
             </article>
             <article>
               <h3>Linux AppImage</h3>
               <p>One file, no install step. This is the Linux build that can update itself.</p>
-              <a class="button button-primary" data-asset="appimage" href="https://github.com/NaxeCode/activitymux/releases/latest">Download AppImage <span data-size></span></a>
+              <a class="button button-primary" data-asset="appimage" data-demo-action="open_release" href="https://github.com/NaxeCode/activitymux/releases/latest">Download AppImage <span data-size></span></a>
             </article>
             <article>
               <h3>Linux .deb</h3>
               <p>For Debian and Ubuntu. It does not update itself. Install the next release over it.</p>
-              <a class="button button-secondary" data-asset="deb" href="https://github.com/NaxeCode/activitymux/releases/latest">Download .deb <span data-size></span></a>
+              <a class="button button-secondary" data-asset="deb" data-demo-action="open_release" href="https://github.com/NaxeCode/activitymux/releases/latest">Download .deb <span data-size></span></a>
             </article>
           </div>
           <p class="download-fallback"><a href="https://github.com/NaxeCode/activitymux/releases/latest">All releases and checksums</a></p>
@@ -204,6 +205,7 @@
     <footer>
       <div class="shell footer-inner">
         <a class="wordmark" href="#top"><img src="./assets/icon.svg" width="24" height="24" alt="" /><span>ActivityMux</span></a>
+        <label hidden data-public-project="activitymux" data-analytics-preference><input type="checkbox"> Allow Google Analytics</label>
         <p>Built by <a href="https://github.com/NaxeCode">NaxeCode</a>. MIT licensed.</p>
       </div>
     </footer>
