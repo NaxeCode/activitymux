@@ -9,9 +9,9 @@ A desktop app for Windows and Linux that sets one Discord Rich Presence from pre
 ![Rust](https://img.shields.io/badge/Rust-7fbbb3?style=flat&labelColor=2d353b&logo=rust&logoColor=d3c6aa)
 ![React](https://img.shields.io/badge/React-7fbbb3?style=flat&labelColor=2d353b&logo=react&logoColor=d3c6aa)
 ![TypeScript](https://img.shields.io/badge/TypeScript-7fbbb3?style=flat&labelColor=2d353b&logo=typescript&logoColor=d3c6aa)
-[![demo](https://img.shields.io/badge/demo-live-a7c080?style=flat&labelColor=2d353b)](https://naxecode.github.io/activitymux/)
+[![demo](https://img.shields.io/badge/demo-live-a7c080?style=flat&labelColor=2d353b)](https://naxe.dev/activitymux/?utm_source=github&utm_medium=readme&utm_campaign=portfolio&utm_content=activitymux)
 
-[Website](https://naxecode.github.io/activitymux/) · [Download](https://github.com/NaxeCode/activitymux/releases/latest)
+[Website](https://naxe.dev/activitymux/?utm_source=github&utm_medium=readme&utm_campaign=portfolio&utm_content=activitymux) · [Download](https://github.com/NaxeCode/activitymux/releases/latest)
 
 ![ActivityMux dashboard](site/assets/dashboard.webp)
 
@@ -90,4 +90,4 @@ Released and in use, currently v0.2.x. Windows installers are not code-signed ye
 MIT
 
 ---
-<sub>Built by [Aladdin Ali](https://github.com/NaxeCode) · [naxecode.github.io](https://naxecode.github.io)</sub>
+<sub>Built by [Aladdin Ali](https://github.com/NaxeCode) · [naxecode.github.io](https://naxe.dev/?utm_source=github&utm_medium=readme&utm_campaign=portfolio&utm_content=activitymux)</sub>
